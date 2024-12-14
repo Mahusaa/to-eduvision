@@ -1,8 +1,7 @@
 import TryoutInterface from "~/components/TryoutInterface";
-import { fetchAnswersbySubtest, getProblembySubtest, getUserTimebyId } from "~/server/queries";
+import { getProblembySubtest, getUserTimebyId } from "~/server/queries";
 import { redirect } from "next/navigation";
-import SimpleRadioGroup from "~/components/SimpleRadioGroup";
-import TestPage from "~/components/SimpleRadioGroup";
+import { auth } from "~/server/auth";
 
 
 type Params = Promise<{ subtest: string; userId: string; tryoutId: number }>
@@ -14,6 +13,8 @@ export default async function TryoutInterfacePage(props: { params: Params }) {
   const tryoutId = params.tryoutId
   const allProblem = await getProblembySubtest(1, subtest);
   const userTime = await getUserTimebyId(userId, tryoutId);
+  const session = await auth()
+  if(!session) return redirect("sign-in")
 
 
   const subtestMapping: Record<

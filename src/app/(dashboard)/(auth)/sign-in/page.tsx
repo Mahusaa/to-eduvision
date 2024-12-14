@@ -1,9 +1,18 @@
+import { auth } from '~/server/auth';
 import { loginAction } from './login'
 import LoginForm from './login-form'
+import { redirect } from 'next/navigation';
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  // Get the session to check if the user is logged in
+  const session = await auth()
+
+  if (session) {
+    redirect("/");
+  }
+
   return (
-    <div className=" flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Sign in to your account
@@ -24,5 +33,4 @@ export default function LoginPage() {
     </div>
   )
 }
-
 

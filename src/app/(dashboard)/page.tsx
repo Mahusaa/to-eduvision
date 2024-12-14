@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
+import { auth } from "~/server/auth";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth()
+
   return (
     <main className="flex flex-1 flex-col items-center justify-center p-24">
       <h1 className="text-4xl font-bold mb-8">Welcome to Tryout Platform</h1>

@@ -12,6 +12,10 @@ import {
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
+export const Role = {
+  ADMIN: 'admin',
+  USER: 'user',
+} as const;
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
  * database instance for multiple projects.
@@ -45,15 +49,19 @@ export const users = createTable("user", {
   id: varchar("id", { length: 255 })
     .notNull()
     .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: varchar("name", { length: 255 }),
+    .default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(),
+  role: varchar("role", { length: 15 }).notNull().default(Role.USER),
   emailVerified: timestamp("email_verified", {
     mode: "date",
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
+  password: varchar("password", { length: 255 }),
 });
+
+export type User = typeof users.$inferSelect
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
@@ -155,15 +163,30 @@ export const tryouts = createTable("tryout", {
   pmTotal: integer('pm_total').notNull(),
 });
 
+export type TryoutData = typeof tryouts.$inferSelect;
+
 export const questions = createTable("question", {
   id: serial("id").primaryKey(),
   tryoutId: integer('tryout_id').references(() => tryouts.id),
   questionNumber: integer('question_number').notNull(),
   subtest: varchar('subtest', { length: 20 }).notNull(),
-  problemDesc: varchar('problem_desc', { length: 255 }).notNull(),
-  option: varchar('option', { length: 255 }).notNull(),
+  problemDesc: varchar('problem_desc'),
+  option: varchar('option'),
+  imagePath: varchar("image_path"),
 });
 export type AllProblems = typeof questions.$inferSelect;
+
+export const answerKey = createTable("answerKey", {
+  id: serial("id").primaryKey(),
+  tryoutId: integer('tryout_id').references(() => tryouts.id),
+  questionNumber: integer('question_number').notNull(),
+  subtest: varchar('subtest', { length: 20 }).notNull(),
+  answer: varchar('answer'),
+  explanation: varchar("explanation"),
+  imagePath: varchar("image_path"),
+  linkPath: varchar("link"),
+});
+
 
 export const answerSum = createTable("answerSum", {
   id: serial("id").primaryKey(),
@@ -192,15 +215,17 @@ export const userTime = createTable("userTime", {
   id: serial("id").primaryKey(),
   userId: varchar('user_id', { length: 255 }).references(() => users.id),
   tryoutId: integer('tryout_id').references(() => tryouts.id),
-  tryoutEnd: timestamp('tryout_end'),
-  puEnd: timestamp('pu_end'),
-  pbmEnd: timestamp('pbm_end'),
-  ppuEnd: timestamp('ppu_end'),
-  kkEnd: timestamp('kk_end'),
-  lbindEnd: timestamp('lbind_end'),
-  lbingEnd: timestamp('lbing_end'),
-  pmEnd: timestamp('pm_end'),
+  tryoutEnd: timestamp('tryout_end', { withTimezone: true }),
+  puEnd: timestamp('pu_end', { withTimezone: true }),
+  pbmEnd: timestamp('pbm_end', { withTimezone: true }),
+  ppuEnd: timestamp('ppu_end', { withTimezone: true }),
+  kkEnd: timestamp('kk_end', { withTimezone: true }),
+  lbindEnd: timestamp('lbind_end', { withTimezone: true }),
+  lbingEnd: timestamp('lbing_end', { withTimezone: true }),
+  pmEnd: timestamp('pm_end', { withTimezone: true }),
 });
+
+export type UserTime = typeof userTime.$inferSelect
 
 export const userScore = createTable('userScore', {
   id: serial("id").primaryKey(),

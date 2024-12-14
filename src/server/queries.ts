@@ -1,19 +1,23 @@
 import "server-only"
 import { db } from "./db";
-import { userAnswer } from "./db/schema";
+import { answerKey, questions, userAnswer, userTime } from "./db/schema";
+import { and, eq, asc } from "drizzle-orm";
+import type { User } from "./db/schema";
+import { tryouts } from "./db/schema";
 
-type StoredAnswer = {
-  questionId: number;
-  selectedAnswer: string;
-};
+
+type SubtestData = Record<string, { duration: number; total: number }>;
+
 
 // User
-export async function getUserByEmail(email: string) {
+export async function getUserByEmail(email: string): Promise<User | null> {
   const user = await db.query.users.findFirst({
     where: (model, { eq }) => eq(model.email, email),
-  })
-  return user;
+  });
+
+  return user ?? null;
 }
+
 
 // Tryout
 export async function getTryoutById(id: number) {
@@ -40,11 +44,6 @@ export async function getProblembySubtest(tryoutId: number, subtest: string) {
 
 
 // //Answer post
-// export async function storeAnswer(data: AnswerData) {
-//   const { userId, tryoutId, questionId, selectedAnswer } = data
-//
-// }
-
 export async function fetchAnswersbySubtest(userId: string, tryoutId: number, subtest: string) {
   console.log(subtest)
   const userAnswerbySubtest = await db.query.userAnswer.findMany({
