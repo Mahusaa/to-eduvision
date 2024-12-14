@@ -4,12 +4,12 @@ import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { Timer, BookOpen, Brain, Calculator, Languages, School } from 'lucide-react'
 import { SectionCard } from './TryoutSection'
-import type { TryoutData } from '~/server/db/schema'
+import type { TryoutData, UserTime } from '~/server/db/schema'
 import { useState, useEffect } from 'react'
 import formatTime from '~/lib/format-time'
 import { Loader2 } from 'lucide-react'
 
-export default function TryoutOverview({ tryoutData, tryoutLeft }: { tryoutData: TryoutData; tryoutLeft: string | null }) {
+export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: { tryoutData: TryoutData; tryoutLeft: Date | null; tryoutTime: UserTime }) {
 
 
   const {
@@ -57,7 +57,8 @@ export default function TryoutOverview({ tryoutData, tryoutLeft }: { tryoutData:
         duration: puDuration,
         icon: Brain,
         color: 'text-blue-500',
-        code: "pu"
+        code: "pu",
+        end: tryoutTime.puEnd,
       },
       {
         title: 'Kemampuan Kuantitatif',
@@ -65,7 +66,8 @@ export default function TryoutOverview({ tryoutData, tryoutLeft }: { tryoutData:
         duration: kkDuration,
         icon: School,
         color: 'text-green-500',
-        code: "kk"
+        code: "kk",
+        end: tryoutTime.kkEnd,
       },
       {
         title: 'Pemahaman Bacaan dan Menulis',
@@ -73,7 +75,8 @@ export default function TryoutOverview({ tryoutData, tryoutLeft }: { tryoutData:
         duration: pbmDuration,
         icon: Calculator,
         color: 'text-yellow-500',
-        code: "pbm"
+        code: "pbm",
+        end: tryoutTime.pbmEnd,
       },
       {
         title: 'Pengetahuan dan Pemahaman Umum',
@@ -81,7 +84,8 @@ export default function TryoutOverview({ tryoutData, tryoutLeft }: { tryoutData:
         duration: ppuDuration,
         icon: School,
         color: 'text-green-500',
-        code: "ppu"
+        code: "ppu",
+        end: tryoutTime.ppuEnd,
       },
     ],
     literasi: [
@@ -91,7 +95,8 @@ export default function TryoutOverview({ tryoutData, tryoutLeft }: { tryoutData:
         duration: lbinDuration,
         icon: Languages,
         color: 'text-red-500',
-        code: "lbi"
+        code: "lbi",
+        end: tryoutTime.lbindEnd,
       },
       {
         title: 'Literasi Bahasa Inggris',
@@ -99,7 +104,8 @@ export default function TryoutOverview({ tryoutData, tryoutLeft }: { tryoutData:
         duration: lbingDuration,
         icon: Languages,
         color: 'text-indigo-500',
-        code: "lbing"
+        code: "lbing",
+        end: tryoutTime.lbingEnd,
       },
       {
         title: 'Penalaran Matematika',
@@ -107,7 +113,8 @@ export default function TryoutOverview({ tryoutData, tryoutLeft }: { tryoutData:
         duration: pmDuration,
         icon: Calculator,
         color: 'text-pink-500',
-        code: "pm"
+        code: "pm",
+        end: tryoutTime.pmEnd,
       },
     ],
   };

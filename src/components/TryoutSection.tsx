@@ -7,22 +7,43 @@ import { redirect, useParams } from "next/navigation";
 
 type Section = {
   title: string;
-  icon: FC<SVGProps<SVGSVGElement>>; // Correctly typing Lucide React icons
+  icon: FC<SVGProps<SVGSVGElement>>;
   color: string;
   total: number;
   duration: number;
   code: string;
+  end: Date | null;
 };
-
 
 // Component
 export function SectionCard({ section, isDisabled }: { section: Section; isDisabled: boolean }) {
-  const params = useParams<{ userId: string; tryoutId: string }>()
+  const now = new Date();
+  let disableCondition = false;
+  let buttonText = "Mulai";
+
+  if (isDisabled) {
+    disableCondition = true;
+    buttonText = "Waktu Habis";  // If `isDisabled` is true, all subtests are disabled
+  } else if (section.end) {
+    if (new Date(section.end) < now) {
+      disableCondition = true;
+      buttonText = "Waktu Habis";  // If the end time has passed, disable and show "Waktu Habis"
+    } else {
+      buttonText = "Lanjutkan";  // If end time is in the future, we can continue
+    }
+  } else {
+    // If `section.end` is null, allow starting
+    disableCondition = false;
+    buttonText = "Mulai";
+  }
+
+  const params = useParams<{ userId: string; tryoutId: string }>();
   const handleStart = () => {
     redirect(`/${params.userId}/${params.tryoutId}/${section.code}`);
   };
+
   return (
-    <Card className={`transition-all ${isDisabled ? 'opacity-50' : 'hover:shadow-md'}`}>
+    <Card className={`transition-all ${disableCondition ? 'opacity-50' : 'hover:shadow-md'}`}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -38,10 +59,10 @@ export function SectionCard({ section, isDisabled }: { section: Section; isDisab
             variant="ghost"
             className={`flex items-center ${isDisabled ? 'cursor-not-allowed' : 'group-hover:translate-x-1 transition-transform'}`}
             onClick={handleStart}
-            disabled={isDisabled}
+            disabled={disableCondition}
           >
-            {isDisabled ? 'Waktu Habis' : 'Mulai'}
-            {!isDisabled && <ChevronRight className="w-4 h-4 ml-1" />}
+            {buttonText}
+            {!disableCondition && <ChevronRight className="w-4 h-4 ml-1" />}
           </Button>
         </div>
       </CardContent>

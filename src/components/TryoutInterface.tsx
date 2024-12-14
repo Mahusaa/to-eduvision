@@ -11,6 +11,21 @@ import type { AllProblems } from '~/server/db/schema';
 import { TryoutTimer } from './tryout-interface/time';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { z } from 'zod';
+
+
+const answerSubmissionSchema = z.object({
+  answerArray: z.array(z.string().nullable()), // Array of strings or nulls
+  subtest: z.string(), // Subtest code must be a string
+  userId: z.string(), // User ID must be a string
+  tryoutId: z.number(), // Tryout ID must be a number
+})
+
+const endTimeSchema = z.object({
+  subtest: z.string(), // Subtest code must be a string
+  userId: z.string(), // User ID must be a string
+  tryoutId: z.number(), // Tryout ID must be a number
+})
 
 export default function TryoutInterface({
   allProblem,
@@ -37,13 +52,12 @@ export default function TryoutInterface({
   const localStorageKey = `tryout-${tryoutId}-${userId}-${subtestProps}-answers`;
 
   useEffect(() => {
-    setIsClient(true); // Mark that rendering is on the client
-
-    const savedAnswers = JSON.parse(localStorage.getItem(localStorageKey) || '[]');
+    setIsClient(true);
+    const savedAnswers = JSON.parse(localStorage.getItem(localStorageKey) ?? '[]') as (string | null)[];
     setAnswers(savedAnswers.length ? savedAnswers : new Array(totalQuestions).fill(null));
   }, [localStorageKey, totalQuestions]);
 
-  // Sync localStorage with answers
+
   useEffect(() => {
     if (isClient) {
       localStorage.setItem(localStorageKey, JSON.stringify(answers));
@@ -69,40 +83,72 @@ export default function TryoutInterface({
     });
   };
 
-  const handleTimeUp = useCallback(() => {
-    setTimeout(() => {
+  const handleTimeUp = useCallback(async () => {
+    try {
+      const endTimeData = {
+        tryoutId: Number(tryoutId),
+        subtest: subtestCode,
+        userId,
+      }
+      endTimeSchema.parse(endTimeData);
+
+      const response = await fetch('/api/update-subtestend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(endTimeData),
+      });
       router.push(`/${userId}/${tryoutId}`);
-    }, 0);
-  }, [router, userId, tryoutId]);
+      if (!response.ok) {
+        console.error('Failed to record end time:', await response.text());
+      } else {
+        console.log('End time recorded successfully');
+      }
+    } catch (error) {
+      console.error("error ngirim", error)
+    }
+  }, [router, userId, tryoutId, subtestCode]);
 
   const handleSubmit = async () => {
     try {
-      console.log('Submitting answers:', answers);
+      const submissionData = {
+        answerArray: answers,
+        subtest: subtestCode,
+        userId,
+        tryoutId: Number(tryoutId),
+      };
+      answerSubmissionSchema.parse(submissionData);
 
       const response = await fetch('/api/submit-answer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ answerArray: answers, subtest: subtestCode, userId, tryoutId }),
+        body: JSON.stringify(submissionData),
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as Promise<{ message: string }>;
         console.log('Response from server:', data);
-        alert('Answers submitted successfully!');
+        localStorage.removeItem(localStorageKey);
+        await handleTimeUp()
       } else {
         console.error('Error submitting answers');
         alert('Failed to submit answers.');
       }
     } catch (error) {
-      console.error('Error during submission:', error);
-      alert('An error occurred while submitting answers.');
+      if (error instanceof z.ZodError) {
+        console.error('Validation error:', error.errors);
+        alert('Validation failed. Please check your data.');
+      } else {
+        console.error('Error during submission:', error);
+        alert('An error occurred while submitting answers.');
+      }
     }
   };
 
   if (!isClient) {
-    // Avoid rendering during SSR to prevent hydration mismatch
     return null;
   }
 
@@ -225,7 +271,6 @@ export default function TryoutInterface({
                         <ChevronRight className="w-4 h-4" />
                       </Button>) : ""
                   }
-
                     <Button
                       className="gap-2 mx-4"
                       onClick={() => handleQuestionChange(currentQuestionIndex + 1)}
@@ -234,10 +279,7 @@ export default function TryoutInterface({
                       Selanjutnya
                       <ChevronRight className="w-4 h-4" />
                     </Button>
-
-
                   </div>
-
                 </div>
               </div>
             </div>

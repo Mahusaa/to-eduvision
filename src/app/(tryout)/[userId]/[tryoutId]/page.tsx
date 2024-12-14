@@ -22,7 +22,9 @@ export default async function TryoutPage({
     <>
       <TryoutOverview
         tryoutData={tryoutData}
-        tryoutLeft={tryoutLeft} />
+        tryoutLeft={tryoutLeft}
+        tryoutTime={tryoutTime}
+      />
     </>)
 }
 

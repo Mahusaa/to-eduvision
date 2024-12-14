@@ -66,3 +66,134 @@ export async function postUserAnswer(userId: string, tryoutId: number, subtest: 
       }
     })
 }
+
+export async function postSubtestEnd(userId: string, tryoutId: number, subtest: string) {
+  const columnMap: Record<string, keyof typeof userTime> = {
+    pu: 'puEnd',
+    pbm: 'pbmEnd',
+    ppu: 'ppuEnd',
+    kk: 'kkEnd',
+    lbind: 'lbindEnd',
+    lbing: 'lbingEnd',
+    pm: 'pmEnd',
+  };
+  const columnToUpdate = columnMap[subtest];
+  if (!columnToUpdate) {
+    throw new Error(`Invalid subtest: ${subtest}`);
+  }
+  await db.update(userTime).set({
+    [columnToUpdate]: new Date(),
+  }).where(and(eq(userTime.userId, userId), eq(userTime.tryoutId, tryoutId)))
+}
+
+export async function getQuestionAnswerData(tryoutId: number, subtest: string) {
+  const result = await db
+    .select({
+      tryoutId: questions.tryoutId,
+      questionNumber: questions.questionNumber,
+      subtest: questions.subtest,
+      problemDesc: questions.problemDesc,
+      option: questions.option,
+      questionImagePath: questions.imagePath,
+      answer: answerKey.answer,
+      explanation: answerKey.explanation,
+      explanationImagePath: answerKey.imagePath,
+      linkPath: answerKey.linkPath,
+    })
+    .from(questions)
+    .leftJoin(
+      answerKey,
+      and(
+        eq(questions.tryoutId, answerKey.tryoutId),
+        eq(questions.subtest, answerKey.subtest),
+        eq(questions.questionNumber, answerKey.questionNumber) // Ensure the question number matches
+      )
+    )
+    .where(
+      and(
+        eq(questions.tryoutId, tryoutId),
+        eq(questions.subtest, subtest)
+      )
+    )
+    .groupBy(
+      questions.tryoutId,
+      questions.questionNumber,
+      questions.subtest,
+      questions.problemDesc,
+      questions.option,
+      questions.imagePath,
+      answerKey.answer,
+      answerKey.explanation,
+      answerKey.imagePath,
+      answerKey.linkPath
+    )
+    .orderBy(asc(questions.questionNumber));
+
+  return result;
+}
+
+
+// Create Tryout
+export async function postCreateTryout(data: {
+  tryoutName: string;
+  tryoutEnd: Date;
+  tryoutNumber: number;
+  subtestData: Record<string, { duration: number; total: number }>;
+}) {
+  const {
+    tryoutName,
+    tryoutEnd,
+    tryoutNumber,
+    subtestData,
+  } = data;
+  const totalDuration = Object.values(subtestData).reduce((sum, subtest) => {
+    return sum + subtest.duration;
+  }, 0);
+  const adjustedDuration = totalDuration + 10
+
+  const result = await db.insert(tryouts).values({
+    name: tryoutName,
+    endedAt: new Date(tryoutEnd),
+    tryoutNumber,
+    mode: "tutup",
+    duration: adjustedDuration,
+    puDuration: subtestData.pu?.duration ?? 0,
+    pbmDuration: subtestData.pbm?.duration ?? 0,
+    ppuDuration: subtestData.ppu?.duration ?? 0,
+    kkDuration: subtestData.kk?.duration ?? 0,
+    lbinDuration: subtestData.lbin?.duration ?? 0,
+    lbingDuration: subtestData.lbing?.duration ?? 0,
+    pmDuration: subtestData.pm?.duration ?? 0,
+    puTotal: subtestData.pu?.total ?? 0,
+    pbmTotal: subtestData.pbm?.total ?? 0,
+    ppuTotal: subtestData.ppu?.total ?? 0,
+    kkTotal: subtestData.kk?.total ?? 0,
+    lbinTotal: subtestData.lbin?.total ?? 0,
+    lbingTotal: subtestData.lbing?.total ?? 0,
+    pmTotal: subtestData.pm?.total ?? 0,
+  })
+    .returning({ tryoutId: tryouts.id })
+
+  return result
+
+}
+
+
+export async function postQuestionsbySubtest(tryoutId: number, subtestData: SubtestData) {
+  for (const [subtest, data] of Object.entries(subtestData)) {
+    const totalQuestions = data.total;
+
+    const questionInserts = Array.from({ length: totalQuestions }, (_, index) => ({
+      tryoutId,
+      questionNumber: index + 1,
+      subtest,
+      problemDesc: null,
+      option: null,
+      imagePath: null,
+    }));
+
+    await db.insert(questions).values(questionInserts);
+  }
+}
+
+

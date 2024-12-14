@@ -1,14 +1,10 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { type DefaultSession, type NextAuthConfig } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import type { DefaultSession, NextAuthConfig, } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 import { db } from "~/server/db";
-import {
-  accounts,
-  sessions,
-  users,
-  verificationTokens,
-} from "~/server/db/schema";
+import { users, accounts, sessions, verificationTokens } from "~/server/db/schema";
+import { getUserByEmail } from "../queries";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -20,15 +16,9 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      role: string;
     } & DefaultSession["user"];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
 /**
@@ -36,18 +26,36 @@ declare module "next-auth" {
  *
  * @see https://next-auth.js.org/configuration/options
  */
+
 export const authConfig = {
   providers: [
-    DiscordProvider,
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: {
+          label: "email:",
+          type: "text",
+          placeholder: "your-cool-username"
+        },
+        password: {
+          label: "Password:",
+          type: "password",
+          placeholder: "your-awesome-password"
+        }
+      },
+      async authorize(credentials) {
+        const user = await getUserByEmail(credentials?.email as string)
+
+        // to verify with credentials
+
+        if (user?.password === credentials?.password) {
+          return user
+        } else {
+          console.log("salah brok")
+          return null
+        }
+      }
+    })
   ],
   adapter: DrizzleAdapter(db, {
     usersTable: users,
@@ -56,12 +64,25 @@ export const authConfig = {
     verificationTokensTable: verificationTokens,
   }),
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        // @ts-expect-error: my User token.role doesnt define in my User
+        token.role = user.role
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.sub!;
+        session.user.role = token.role as string;
+        return session
+      }
+      return session;
+    },
+  },
+  session: {
+    strategy: "jwt"
   },
 } satisfies NextAuthConfig;
+
