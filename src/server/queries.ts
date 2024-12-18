@@ -7,7 +7,26 @@ import { tryouts } from "./db/schema";
 
 
 type SubtestData = Record<string, { duration: number; total: number }>;
+interface updatedData {
+  problemDesc?: string;
+  option?: string;
+  questionImagePath?: string;
+  answer?: string;
+  explanation?: string;
+  explanationImagePath?: string;
+  linkPath?: string;
+}
 
+const columnMap: Record<string, keyof typeof userTime.$inferInsert> = {
+  pu: "puEnd",
+  pbm: "pbmEnd",
+  ppu: "ppuEnd",
+  kk: "kkEnd",
+  lbind: "lbindEnd",
+  lbing: "lbingEnd",
+  pm: "pmEnd",
+  tryout: "tryoutEnd",
+};
 
 // User
 export async function getUserByEmail(email: string): Promise<User | null> {
@@ -19,7 +38,6 @@ export async function getUserByEmail(email: string): Promise<User | null> {
 }
 
 
-// Tryout
 export async function getTryoutById(id: number) {
   const tryoutData = await db.query.tryouts.findFirst({
     where: (model, { eq }) => eq(model.id, id),
@@ -27,16 +45,66 @@ export async function getTryoutById(id: number) {
   return tryoutData;
 }
 
+export async function getAllTryout() {
+  const allTryout = await db.query.tryouts.findMany({
+    columns: {
+      id: true,
+      tryoutNumber: true,
+      mode: true,
+      endedAt: true,
+      duration: true,
+    },
+    with: {
+      userTimes: {
+        columns: {
+          tryoutEnd: true
+        }
+      }
+
+    }
+  })
+  return allTryout;
+}
+
+export async function startTryout(userId: string, tryoutId: number, tryoutEnd: Date) {
+  await db.insert(userTime).values({
+    userId,
+    tryoutId,
+    tryoutEnd: new Date(tryoutEnd),
+  })
+}
+
+
+export async function updateSectionEndTime(sectionId: number, subtest: string, endTime: Date) {
+  const columnMap: Record<string, keyof typeof userTime.$inferInsert> = {
+    pu: "puEnd",
+    pbm: "pbmEnd",
+    ppu: "ppuEnd",
+    kk: "kkEnd",
+    lbind: "lbindEnd",
+    lbing: "lbingEnd",
+    pm: "pmEnd",
+    tryout: "tryoutEnd",
+  };
+  const columnToUpdate = columnMap[subtest]
+  console.log(columnToUpdate)
+  if (!columnToUpdate) throw new Error("Invalid subtes")
+
+  await db.update(userTime).set({
+    [columnToUpdate]: endTime
+  }).where(eq(userTime.id, sectionId))
+}
+
 export async function getUserTimebyId(userId: string, tryoutId: number) {
   const userTime = await db.query.userTime.findFirst({
-    where: (model, { eq }) => eq(model.userId, userId) && eq(model.tryoutId, tryoutId),
+    where: (model, { eq, and }) => and(eq(model.userId, userId), eq(model.tryoutId, tryoutId)),
   })
   return userTime;
 }
 
 export async function getProblembySubtest(tryoutId: number, subtest: string) {
   const allProblem = await db.query.questions.findMany({
-    where: (model, { eq }) => eq(model.tryoutId, tryoutId) && eq(model.subtest, subtest),
+    where: (model, { eq, and }) => and(eq(model.tryoutId, tryoutId), eq(model.subtest, subtest)),
     orderBy: (model, { asc }) => asc(model.questionNumber),
   })
   return allProblem
@@ -106,7 +174,7 @@ export async function getQuestionAnswerData(tryoutId: number, subtest: string) {
       and(
         eq(questions.tryoutId, answerKey.tryoutId),
         eq(questions.subtest, answerKey.subtest),
-        eq(questions.questionNumber, answerKey.questionNumber) // Ensure the question number matches
+        eq(questions.questionNumber, answerKey.questionNumber)
       )
     )
     .where(
@@ -180,6 +248,7 @@ export async function postCreateTryout(data: {
 
 
 export async function postQuestionsbySubtest(tryoutId: number, subtestData: SubtestData) {
+  const optionBuffer = '[\"Option 1\", \"Option 2\", \"Option 3\", \"Option 4\", \"Option 5\"]';
   for (const [subtest, data] of Object.entries(subtestData)) {
     const totalQuestions = data.total;
 
@@ -188,7 +257,7 @@ export async function postQuestionsbySubtest(tryoutId: number, subtestData: Subt
       questionNumber: index + 1,
       subtest,
       problemDesc: null,
-      option: null,
+      option: optionBuffer,
       imagePath: null,
     }));
 
@@ -196,4 +265,51 @@ export async function postQuestionsbySubtest(tryoutId: number, subtestData: Subt
   }
 }
 
+
+export async function updateQuestionbyNumber(
+  tryoutId: number,
+  subtest: string,
+  questionNumber: number,
+  updatedData: updatedData
+) {
+  function convertAnswerToLetter(answer: number): string {
+    const letters = ['A', 'B', 'C', 'D', 'E'];
+    return letters[answer] ?? '';
+  }
+
+  const letterAnswer = convertAnswerToLetter(Number(updatedData.answer));
+
+  await db.update(questions)
+    .set({
+      problemDesc: updatedData.problemDesc,
+      option: updatedData.option,
+      imagePath: updatedData.questionImagePath
+    })
+    .where(and(
+      eq(questions.tryoutId, tryoutId),
+      eq(questions.subtest, subtest),
+      eq(questions.questionNumber, questionNumber)
+    ));
+
+  await db.insert(answerKey)
+    .values({
+      tryoutId,
+      questionNumber,
+      subtest,
+      answer: convertAnswerToLetter(Number(updatedData.answer)),
+      explanation: updatedData.explanation,
+      imagePath: updatedData.explanationImagePath,
+      linkPath: updatedData.linkPath,
+    }).onConflictDoUpdate({
+      target: [answerKey.tryoutId, answerKey.questionNumber, answerKey.subtest],
+      set: {
+        answer: updatedData.answer,
+        explanation: updatedData.explanation,
+        imagePath: updatedData.explanationImagePath,
+        linkPath: updatedData.linkPath,
+      }
+    })
+
+
+}
 

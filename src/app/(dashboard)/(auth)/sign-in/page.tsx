@@ -4,7 +4,6 @@ import LoginForm from './login-form'
 import { redirect } from 'next/navigation';
 
 export default async function LoginPage() {
-  // Get the session to check if the user is logged in
   const session = await auth()
 
   if (session) {

@@ -124,11 +124,11 @@ export default function TryoutForm({ className }: React.ComponentProps<`form`>) 
         body: JSON.stringify(tryoutData),
       })
       if (response.ok) {
-        const result = await response.json();
+        const result = await response.json() as { message: string};
         console.log('Tryout created successfully:', result);
         alert('Tryout created successfully!');
       } else {
-        const error = await response.json();
+        const error = await response.json() as {message: string};
         console.error('Error:', error.message);
         alert('Failed to create tryout!');
       }

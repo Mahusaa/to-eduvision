@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "~/server/db";
 import { users, accounts, sessions, verificationTokens } from "~/server/db/schema";
 import { getUserByEmail } from "../queries";
+import { verifyPassword } from "~/lib/auth-utils";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -35,7 +36,7 @@ export const authConfig = {
         email: {
           label: "email:",
           type: "text",
-          placeholder: "your-cool-username"
+          placeholder: "abcd@gmail.com"
         },
         password: {
           label: "Password:",
@@ -44,15 +45,25 @@ export const authConfig = {
         }
       },
       async authorize(credentials) {
-        const user = await getUserByEmail(credentials?.email as string)
+        const email = credentials?.email as string | null
+        const password = credentials?.password as string | null;
 
-        // to verify with credentials
 
-        if (user?.password === credentials?.password) {
-          return user
+        if (!email || !password) {
+          console.log("Email or password is missing");
+          return null;
+        }
+        const user = await getUserByEmail(email)
+        if (!user) {
+          console.log("User not found");
+          return null;
+        }
+        const isPasswordValid = await verifyPassword(password, user.password!);
+        if (isPasswordValid) {
+          return user;
         } else {
-          console.log("salah brok")
-          return null
+          console.log("Invalid password");
+          return null;
         }
       }
     })

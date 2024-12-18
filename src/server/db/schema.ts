@@ -185,7 +185,11 @@ export const answerKey = createTable("answerKey", {
   explanation: varchar("explanation"),
   imagePath: varchar("image_path"),
   linkPath: varchar("link"),
-});
+}, (table) => ({
+  uniqueConstraint: unique('answerKey_unique_constraint').on(table.questionNumber, table.tryoutId, table.subtest),
+})
+
+);
 
 
 export const answerSum = createTable("answerSum", {
@@ -233,4 +237,13 @@ export const userScore = createTable('userScore', {
   tryoutId: integer('tryout_id').references(() => tryouts.id),
   totalScore: integer('total_score'),
 });
+
+export const userTimeRelations = relations(userTime, ({ one }) => ({
+  user: one(users, { fields: [userTime.userId], references: [users.id] }),
+  tryout: one(tryouts, { fields: [userTime.tryoutId], references: [tryouts.id] }),
+}));
+
+export const tryoutsRelations = relations(tryouts, ({ many }) => ({
+  userTimes: many(userTime),
+}));
 

@@ -210,14 +210,16 @@ export default function TryoutInterface({
                   </h2>
                   <p>{currentQuestion!.problemDesc}</p>
                 </div>
-                <Image
-                  src="/images/yuhu456.jpg"
-                  alt="naga"
-                  width={800}
-                  height={400}
-                  placeholder="blur"
-                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-                />
+                {currentQuestion?.imagePath &&
+                  <Image
+                    src={currentQuestion?.imagePath}
+                    alt="naga"
+                    width={800}
+                    height={400}
+                    placeholder="blur"
+                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+                  />
+                }
 
                 <RadioGroup value={answers[currentQuestionIndex] ?? ''} onValueChange={handleAnswerChange}>
                   <div className="space-y-2">

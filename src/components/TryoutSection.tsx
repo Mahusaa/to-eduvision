@@ -13,6 +13,7 @@ type Section = {
   duration: number;
   code: string;
   end: Date | null;
+  sectionId: number;
 };
 
 // Component
@@ -32,15 +33,41 @@ export function SectionCard({ section, isDisabled }: { section: Section; isDisab
       buttonText = "Lanjutkan";  // If end time is in the future, we can continue
     }
   } else {
-    // If `section.end` is null, allow starting
     disableCondition = false;
     buttonText = "Mulai";
   }
 
   const params = useParams<{ userId: string; tryoutId: string }>();
-  const handleStart = () => {
+  const handleStart = async () => {
+    if (!section.end) {
+      try {
+        const response = await fetch("/api/start-subtest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sectionId: section.sectionId, // Use the section's code or ID
+            duration: section.duration, // Duration in minutes
+            subtest: section.code
+          }),
+        });
+
+        const data = await response.json() as { success: boolean; end: string | Date };
+        if (data.success) {
+          console.log("Subtest end updated:", data.end);
+        } else {
+          console.error("Failed to update subtest end");
+          return; // Prevent redirect on error
+        }
+      } catch (error) {
+        console.error("Error updating subtest end:", error);
+        return; // Prevent redirect on error
+      }
+    }
+
+    // Redirect to the section page
     redirect(`/${params.userId}/${params.tryoutId}/${section.code}`);
   };
+
 
   return (
     <Card className={`transition-all ${disableCondition ? 'opacity-50' : 'hover:shadow-md'}`}>

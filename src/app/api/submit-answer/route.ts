@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 import { postUserAnswer } from '~/server/queries';
 
+interface submitAnswerBody {
+  answerArray: string;
+  subtest: string;
+  userId: string;
+  tryoutId: number;
+}
+
 export async function POST(req: Request) {
   try {
-    // Parse the incoming JSON body
-    const { answerArray, subtest, userId, tryoutId } = await req.json();
+    const { answerArray, subtest, userId, tryoutId } = await req.json() as submitAnswerBody;
     await postUserAnswer(userId, tryoutId, subtest, answerArray)
 
     return NextResponse.json({ message: 'Answers submitted successfully!' }, { status: 200 });

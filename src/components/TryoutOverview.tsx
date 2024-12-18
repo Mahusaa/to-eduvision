@@ -59,6 +59,7 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
         color: 'text-blue-500',
         code: "pu",
         end: tryoutTime.puEnd,
+        sectionId: tryoutTime.id,
       },
       {
         title: 'Kemampuan Kuantitatif',
@@ -68,6 +69,7 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
         color: 'text-green-500',
         code: "kk",
         end: tryoutTime.kkEnd,
+        sectionId: tryoutTime.id,
       },
       {
         title: 'Pemahaman Bacaan dan Menulis',
@@ -77,6 +79,7 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
         color: 'text-yellow-500',
         code: "pbm",
         end: tryoutTime.pbmEnd,
+        sectionId: tryoutTime.id,
       },
       {
         title: 'Pengetahuan dan Pemahaman Umum',
@@ -86,6 +89,7 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
         color: 'text-green-500',
         code: "ppu",
         end: tryoutTime.ppuEnd,
+        sectionId: tryoutTime.id,
       },
     ],
     literasi: [
@@ -95,8 +99,9 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
         duration: lbinDuration,
         icon: Languages,
         color: 'text-red-500',
-        code: "lbi",
+        code: "lbind",
         end: tryoutTime.lbindEnd,
+        sectionId: tryoutTime.id,
       },
       {
         title: 'Literasi Bahasa Inggris',
@@ -106,6 +111,7 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
         color: 'text-indigo-500',
         code: "lbing",
         end: tryoutTime.lbingEnd,
+        sectionId: tryoutTime.id,
       },
       {
         title: 'Penalaran Matematika',
@@ -115,6 +121,7 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
         color: 'text-pink-500',
         code: "pm",
         end: tryoutTime.pmEnd,
+        sectionId: tryoutTime.id,
       },
     ],
   };

@@ -2,8 +2,19 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+type User = {
+  name?: string | null;
+  email: string;
+  image: string;
+  id: string;
+  role: string;
+};
+type Session = {
+  user: Partial<User>; // Semua properti menjadi opsional
+  expires: string;
+};
 
-const Header = () => {
+const Header = ({ session }: { session: Session }) => {
   const pathname = usePathname()
 
   return (
@@ -14,10 +25,29 @@ const Header = () => {
             <Link href="/" className="flex-shrink-0 flex items-center">
               <span className="text-2xl font-bold text-emerald-600">Eduvision Tryout</span>
             </Link>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <NavLink href="/problems" current={pathname === '/problems'}>Tryout</NavLink>
-              <NavLink href="/scores" current={pathname === '/scores'}>Scores</NavLink>
-            </div>
+            {session && (
+              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                <NavLink href="/dashboard" current={pathname === '/dashboard'}>Dashboard</NavLink>
+                <NavLink href="/analitik" current={pathname === '/analitik'}>Analitik</NavLink>
+                {session.user.role === "admin" &&
+                  <NavLink href="/edit/tryout" current={pathname === '/edit/tryout'}>Edit</NavLink>}
+              </div>
+            )}
+          </div>
+          <div className="flex items-center">
+            {!session && (
+              <Link
+                href="/sign-in"
+                className="text-sm font-medium text-emerald-600 hover:text-emerald-800"
+              >
+                Login
+              </Link>
+            )}
+            {session && (
+              <span className="text-sm font-medium text-gray-700">
+                Hi, {session.user?.name ?? 'User'}
+              </span>
+            )}
           </div>
         </div>
       </nav>

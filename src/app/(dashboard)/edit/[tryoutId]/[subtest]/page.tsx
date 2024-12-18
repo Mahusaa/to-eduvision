@@ -9,7 +9,6 @@ export default async function TryoutEditorPage(props: { params: Params }) {
   const subtest = params.subtest
   const tryoutId = params.tryoutId
   const data = await getQuestionAnswerData(tryoutId, subtest)
-  console.log(data, "this is data")
 
   return (
     <EditorInterface

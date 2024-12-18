@@ -11,10 +11,10 @@ export default async function TryoutInterfacePage(props: { params: Params }) {
   const subtest = params.subtest;
   const userId = params.userId
   const tryoutId = params.tryoutId
-  const allProblem = await getProblembySubtest(1, subtest);
+  const allProblem = await getProblembySubtest(tryoutId, subtest);
   const userTime = await getUserTimebyId(userId, tryoutId);
   const session = await auth()
-  if(!session) return redirect("sign-in")
+  if (!session) return redirect("sign-in")
 
 
   const subtestMapping: Record<
@@ -25,7 +25,7 @@ export default async function TryoutInterfacePage(props: { params: Params }) {
     ppu: { name: "Pengetahuan dan Pemahaman Umum", time: userTime!.ppuEnd, code: "ppu" },
     pbm: { name: "Kemampuan Memahami Bacaan dan Menulis", time: userTime!.pbmEnd, code: "pbm" },
     kk: { name: "Kemampuan Kuantitatif", time: userTime!.kkEnd, code: "kk" },
-    lbi: { name: "Literasi Bahasa Indonesia", time: userTime!.lbindEnd, code: "lbi" },
+    lbind: { name: "Literasi Bahasa Indonesia", time: userTime!.lbindEnd, code: "lbind" },
     lbing: { name: "Literasi Bahasa Inggris", time: userTime!.lbingEnd, code: "lbing" },
     pm: { name: "Penalaran Matematika", time: userTime!.pmEnd, code: "pm" },
   };

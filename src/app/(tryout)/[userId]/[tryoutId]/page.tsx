@@ -15,8 +15,8 @@ export default async function TryoutPage({
   const tryoutData = await getTryoutById(tryoutId);
   if (!tryoutData) return null
   const tryoutTime = await getUserTimebyId(userId, tryoutId);
-  const tryoutLeft = tryoutTime!.tryoutEnd
-  console.log(tryoutLeft)
+  if (!tryoutTime) return null
+  const tryoutLeft = tryoutTime.tryoutEnd
 
   return (
     <>
