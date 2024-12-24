@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 // Jumlah salt rounds (disarankan antara 10-12 untuk keamanan yang optimal)
 const SALT_ROUNDS = 10;

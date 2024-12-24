@@ -1,15 +1,17 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "../ui/button"
-import { Label } from "../ui/label"
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
-import Image from "next/image"
-import { Card } from "../ui/card"
+import { useState, useEffect } from "react"
+import { Button } from "~/components/ui/button"
+import { Label } from "~/components/ui/label"
+import { Card } from "~/components/ui/card"
 import { ChevronRight, ZoomOut, ZoomIn, ChevronLeft, Edit, Save, EyeIcon } from 'lucide-react'
-import { Input } from "../ui/input"
-import { Textarea } from "../ui/textarea"
+import { Input } from "~/components/ui/input"
+import { Textarea } from "~/components/ui/textarea"
 import { dataSchema } from "~/types/question-exp"
+import { QuestionNavigator } from "./QuestionNavigator"
+import { OptionEditor } from "./OptionEditor"
+import { ImageUploader } from "./ImageUploader"
+
 
 interface QuestionsDataProps {
   tryoutId?: number | null | undefined;
@@ -22,41 +24,45 @@ interface QuestionsDataProps {
   explanation: string | null,
   explanationImagePath: string | null;
   linkPath: string | null;
-}interface EditorInterfaceProps {
-  questionsData: QuestionsDataProps[];
-}
-interface Option {
-  value: string; // Changed from text to value
-  id: number;
-  description?: string; // Optional property kept the same
 }
 
+interface EditorInterfaceProps {
+  questionsData: QuestionsDataProps[];
+}
+
+interface Option {
+  value: string;
+  id: string;
+  description?: string;
+}
 
 export default function EditorInterface({ questionsData: initialQuestionsData }: EditorInterfaceProps) {
   const [questionsData, setQuestionsData] = useState(initialQuestionsData);
-  const [questionImagePath, setQuestionImagePath] = useState<string>("")
-  const [explanationImagePath, setExplanationImagePath] = useState<string>("")
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
-  const totalQuestions = questionsData.length
-  const currentQuestion = questionsData[currentQuestionIndex];
-  const options: Option[] = currentQuestion?.option && typeof currentQuestion.option === "string"
-    ? (JSON.parse(currentQuestion.option) as Option[])
-    : [];
+  const [correctAnswer, setCorrectAnswer] = useState<string | null>(null);
+  console.log(correctAnswer, "correct answer")
 
+  const totalQuestions = questionsData.length;
+  const currentQuestion = questionsData[currentQuestionIndex];
+  console.log(questionsData)
+
+  useEffect(() => {
+    if (currentQuestion) {
+      setCorrectAnswer(currentQuestion.answer);
+    }
+  }, [currentQuestion]);
+
+  const options: Option[] = currentQuestion?.option
+    ? JSON.parse(currentQuestion.option)
+    : [];
 
   const handleQuestionChange = (index: number) => {
     if (index >= 0 && index < totalQuestions) {
       setCurrentQuestionIndex(index);
-
-      // Set correctAnswer for the current question
-      const currentAnswer = questionsData[index]?.answer;
-      setCorrectAnswer(currentAnswer !== null ? parseInt(currentAnswer!) : null);
     }
   };
-
 
   const handleZoom = (direction: 'in' | 'out') => {
     setZoomLevel((prevZoom) => {
@@ -72,7 +78,6 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
   const handleInputChange = (field: keyof QuestionsDataProps, value: string) => {
     setQuestionsData(prevData => {
       const newData = [...prevData];
-      {/*@ts-expect-error: data from server error*/ }
       newData[currentQuestionIndex] = {
         ...newData[currentQuestionIndex],
         [field]: value
@@ -81,51 +86,35 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
     });
   };
 
-  const handleOptionChange = (index: number, value: string, isCorrect: boolean) => {
+  const handleOptionChange = (optionId: number, value: string) => {
     setQuestionsData((prevData) => {
-      const updatedData = prevData.map((question, idx) => {
-        if (idx === currentQuestionIndex) {
-          const optionsArray: string[] = Array.isArray(question.option)
-            ? [...(question.option as string[])]
-            : JSON.parse(question.option ?? "[]") as string[];
+      const newData = [...prevData];
 
-          optionsArray[index] = value;
+      // Parse the option array from the current question
+      const currentOptions = JSON.parse(newData[currentQuestionIndex].option! ?? '[]');
 
-          return {
-            ...question,
-            option: JSON.stringify(optionsArray),
-            answer: isCorrect ? index.toString() : question.answer,
-          };
-        }
-        return question;
-      });
+      // Update the option at the specified index (optionId)
+      currentOptions[optionId] = value;
 
-      return updatedData;
+      // Update the question's option property with the modified array
+      newData[currentQuestionIndex] = {
+        ...newData[currentQuestionIndex],
+        option: JSON.stringify(currentOptions),
+      };
+
+      return newData;
     });
-
-    // Update local state for correct answer
-    if (isCorrect) {
-      setCorrectAnswer(index);
-    }
   };
 
 
-  const handleFileChange = async (imageType: 'question' | 'explanation', e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    await handleImageUpload(imageType, file);
-  };
-
-  const handleImageUpload = async (imageType: 'question' | 'explanation', file: File | null) => {
-    if (!file) return;
+  const handleImageUpload = async (imageType: 'question' | 'explanation', file: File) => {
     const details = `${imageType}-${questionsData[0]?.tryoutId}-${questionsData[0]?.subtest}-${currentQuestionIndex + 1}`;
 
     const data = new FormData();
     data.append('file', file)
     data.append('details', details)
 
-
     try {
-
       const res = await fetch('/api/upload-image', {
         method: 'POST',
         body: data,
@@ -134,27 +123,31 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
       if (!res.ok) throw new Error(await res.text());
       const result = await res.json() as { success: boolean; message: string; path: string }
       const { path } = result
-      console.log(path)
-      if (imageType === "question") {
-        setQuestionImagePath(path)
-      } else if (imageType === "explanation") {
-        setExplanationImagePath(path)
-      }
+
+      setQuestionsData(prevData => {
+        const newData = [...prevData];
+        newData[currentQuestionIndex] = {
+          ...newData[currentQuestionIndex],
+          [imageType === 'question' ? 'questionImagePath' : 'explanationImagePath']: path
+        };
+        return newData;
+      });
+
       console.log(`${imageType} image uploaded successfully!`);
     } catch (e) {
       console.error("Error during file upload:", e);
     }
   };
+
   const handleSubmit = async () => {
     const updatedData = {
-      problemDesc: questionsData[currentQuestionIndex]?.problemDesc,
-      option: questionsData[currentQuestionIndex]?.option,
-      questionImagePath: questionImagePath,
-      answer: correctAnswer !== null ? correctAnswer.toString() : questionsData[currentQuestionIndex]?.answer,
-      explanation: questionsData[currentQuestionIndex]?.explanation,
-      explanationImagePath: explanationImagePath,
-      linkPath: questionsData[currentQuestionIndex]?.linkPath,
-
+      problemDesc: currentQuestion?.problemDesc,
+      option: currentQuestion?.option,
+      questionImagePath: currentQuestion?.questionImagePath,
+      answer: correctAnswer,
+      explanation: currentQuestion?.explanation,
+      explanationImagePath: currentQuestion?.explanationImagePath,
+      linkPath: currentQuestion?.linkPath,
     }
 
     const data = {
@@ -163,7 +156,6 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
       questionNumber: currentQuestionIndex + 1,
       updatedData,
     };
-
 
     try {
       dataSchema.parse(data)
@@ -181,7 +173,11 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
       }
 
       const result = await res.json() as { success: boolean, message: string };
-      if (!result) { console.log("error update questions") }
+      if (result.success) {
+        console.log("Question updated successfully");
+      } else {
+        console.log("Error updating question:", result.message);
+      }
     } catch (error) {
       console.error('Error updating question:', error);
     }
@@ -201,21 +197,11 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
             </div>
           </div>
         </Card>
-        <Card className="p-4">
-          <h2 className="font-semibold mb-2">Nomor Soal</h2>
-          <div className="grid grid-cols-5 gap-2">
-            {questionsData.map((problem, index) => (
-              <Button
-                key={index}
-                variant={index === currentQuestionIndex ? 'default' : 'outline'}
-                className="h-10 w-10"
-                onClick={() => handleQuestionChange(index)}
-              >
-                {problem.questionNumber}
-              </Button>
-            ))}
-          </div>
-        </Card>
+        <QuestionNavigator
+          totalQuestions={totalQuestions}
+          currentQuestionIndex={currentQuestionIndex}
+          onQuestionChange={handleQuestionChange}
+        />
       </div>
 
       <div className="md:col-span-9">
@@ -224,91 +210,41 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
             <div className="space-y-6">
               <div className="prose max-w-none">
                 <h2 className="text-lg font-semibold">
-                  Soal {currentQuestion!.questionNumber}
+                  Soal {currentQuestion?.questionNumber}
                 </h2>
                 {isEditMode ? (
                   <Textarea
-                    value={currentQuestion!.problemDesc ?? ''}
+                    value={currentQuestion?.problemDesc ?? ''}
                     onChange={(e) => handleInputChange('problemDesc', e.target.value)}
                     className="w-full"
                   />
                 ) : (
-                  <p>{currentQuestion!.problemDesc}</p>
+                  <p>{currentQuestion?.problemDesc}</p>
                 )}
               </div>
-              {isEditMode ? (
-                <div>
-                  <Label htmlFor="questionImage">Question Image</Label>
-                  <Input
-                    id="questionImage"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange('question', e)}
-                  />
-                </div>
-              ) : currentQuestion!.questionImagePath && (
-                <Image
-                  src={currentQuestion!.questionImagePath}
-                  alt="Question"
-                  width={800}
-                  height={400}
-                  placeholder="blur"
-                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-                />
-              )}
 
-              <RadioGroup
-                value={correctAnswer?.toString() ?? ""}
-                onValueChange={(value) => setCorrectAnswer(parseInt(value))} // Update correct answer
-              >
-                <div className="space-y-2">
-                  {options.map((option: Option, index: number) => (
-                    <div key={option.id} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option.id.toString()} id={`option-${option.id}`} />
-                      {isEditMode ? (
-                        <div className="flex items-center space-x-2 flex-grow">
-                          <Input
-                            value={option.value}
-                            onChange={(e) =>
-                              handleOptionChange(index, e.target.value, index === correctAnswer)
-                            }
-                            className="flex-grow"
-                          />
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleOptionChange(index, option.value, true)}
-                          >
-                            Set as Correct
-                          </Button>
-                        </div>
-                      ) : (
-                        <Label
-                          htmlFor={`option-${option.id}`}
-                          className={
-                            correctAnswer === index ? "font-bold text-green-600" : ""
-                          }
-                        >
-                          {option.value}
-                          {correctAnswer === index && " (Correct)"}
-                        </Label>
-                      )}
-                    </div>
-                  ))}                </div>
-              </RadioGroup>
+              <ImageUploader
+                isEditMode={isEditMode}
+                imagePath={currentQuestion?.questionImagePath}
+                onFileChange={(file) => handleImageUpload('question', file)}
+                altText="Question"
+              />
 
-              {!isEditMode && correctAnswer !== null && (
-                <div className="mt-4 p-2 bg-green-100 border border-green-300 rounded">
-                  <p className="text-green-700">Correct Answer: Option {correctAnswer + 1}</p>
-                </div>
-              )}
+              <OptionEditor
+                options={options}
+                isEditMode={isEditMode}
+                correctAnswer={correctAnswer}
+                onOptionChange={handleOptionChange}
+                onCorrectAnswerChange={setCorrectAnswer}
+              />
+
               {isEditMode && (
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="explanation">Explanation</Label>
                     <Textarea
                       id="explanation"
-                      value={currentQuestion!.explanation ?? ''}
+                      value={currentQuestion?.explanation ?? ''}
                       onChange={(e) => handleInputChange('explanation', e.target.value)}
                       className="w-full"
                     />
@@ -317,20 +253,17 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                     <Label htmlFor="link">Link explanation</Label>
                     <Input
                       id="linkpath"
-                      value={currentQuestion!.linkPath ?? ''}
+                      value={currentQuestion?.linkPath ?? ''}
                       onChange={(e) => handleInputChange('linkPath', e.target.value)}
                       className="w-full"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="explanationImage">Explanation Image</Label>
-                    <Input
-                      id="explanationImage"
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleFileChange('explanation', e)}
-                    />
-                  </div>
+                  <ImageUploader
+                    isEditMode={isEditMode}
+                    imagePath={currentQuestion?.explanationImagePath}
+                    onFileChange={(file) => handleImageUpload('explanation', file)}
+                    altText="Explanation"
+                  />
                 </div>
               )}
 
@@ -383,9 +316,8 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                   >
                     <Save className="w-4 h-4" />
                     Save
-                  </Button>)}
-
-
+                  </Button>
+                )}
                 <Button
                   className="gap-2 mx-4"
                   onClick={() => handleQuestionChange(currentQuestionIndex + 1)}
@@ -402,4 +334,5 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
     </main>
   )
 }
+
 

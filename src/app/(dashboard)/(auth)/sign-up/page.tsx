@@ -7,6 +7,7 @@ import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Alert, AlertDescription } from "~/components/ui/alert"
 import { Eye, EyeOff } from 'lucide-react'
+import { hashPassword, verifyPassword } from '~/lib/auth-utils'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -17,6 +18,14 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
+
+  const handleBcrpt = async () => {
+    const hashed = await hashPassword("adminganteng");
+    console.log("Hashed Password:", hashed); // Log the newly generated hash
+    const isValid = await verifyPassword("adminganteng", "$2a$10$7VIKeROz12o8UzQU0865N..tLegEImp./ebhKrp29Kc/3ldAf/7.q"); // Compare against this hash
+    console.log("Is Valid:ss", isValid); // Should return `true`
+
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -131,6 +140,9 @@ export default function RegisterPage() {
           </div>
           <Button type="submit" className="w-full">
             Register
+          </Button>
+          <Button type="button" onClick={handleBcrpt} className="w-full">
+            Test
           </Button>
         </form>
       </div>
