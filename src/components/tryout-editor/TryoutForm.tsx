@@ -16,7 +16,7 @@ const subtestFields = [
   { name: "Kemampuan Memahami Bacaan dan Menulis", code: "pbm" },
   { name: "Pengetahuan dan Pemahaman Umum", code: "ppu" },
   { name: "Kemampuan Kuantitatif", code: "kk" },
-  { name: "Literasi Bahasa Indonesia", code: "lbin" },
+  { name: "Literasi Bahasa Indonesia", code: "lbind" },
   { name: "Literasi Bahasa Inggris", code: "lbing" },
 ];
 
@@ -124,11 +124,11 @@ export default function TryoutForm({ className }: React.ComponentProps<`form`>) 
         body: JSON.stringify(tryoutData),
       })
       if (response.ok) {
-        const result = await response.json() as { message: string};
+        const result = await response.json() as { message: string };
         console.log('Tryout created successfully:', result);
         alert('Tryout created successfully!');
       } else {
-        const error = await response.json() as {message: string};
+        const error = await response.json() as { message: string };
         console.error('Error:', error.message);
         alert('Failed to create tryout!');
       }

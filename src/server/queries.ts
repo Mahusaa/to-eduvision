@@ -17,16 +17,6 @@ interface updatedData {
   linkPath?: string;
 }
 
-const columnMap: Record<string, keyof typeof userTime.$inferInsert> = {
-  pu: "puEnd",
-  pbm: "pbmEnd",
-  ppu: "ppuEnd",
-  kk: "kkEnd",
-  lbind: "lbindEnd",
-  lbing: "lbingEnd",
-  pm: "pmEnd",
-  tryout: "tryoutEnd",
-};
 
 // User
 export async function getUserByEmail(email: string): Promise<User | null> {
@@ -229,14 +219,14 @@ export async function postCreateTryout(data: {
     pbmDuration: subtestData.pbm?.duration ?? 0,
     ppuDuration: subtestData.ppu?.duration ?? 0,
     kkDuration: subtestData.kk?.duration ?? 0,
-    lbinDuration: subtestData.lbin?.duration ?? 0,
+    lbinDuration: subtestData.lbind?.duration ?? 0,
     lbingDuration: subtestData.lbing?.duration ?? 0,
     pmDuration: subtestData.pm?.duration ?? 0,
     puTotal: subtestData.pu?.total ?? 0,
     pbmTotal: subtestData.pbm?.total ?? 0,
     ppuTotal: subtestData.ppu?.total ?? 0,
     kkTotal: subtestData.kk?.total ?? 0,
-    lbinTotal: subtestData.lbin?.total ?? 0,
+    lbinTotal: subtestData.lbind?.total ?? 0,
     lbingTotal: subtestData.lbing?.total ?? 0,
     pmTotal: subtestData.pm?.total ?? 0,
   })
@@ -272,12 +262,6 @@ export async function updateQuestionbyNumber(
   questionNumber: number,
   updatedData: updatedData
 ) {
-  function convertAnswerToLetter(answer: number): string {
-    const letters = ['A', 'B', 'C', 'D', 'E'];
-    return letters[answer] ?? '';
-  }
-
-  const letterAnswer = convertAnswerToLetter(Number(updatedData.answer));
 
   await db.update(questions)
     .set({
@@ -296,7 +280,7 @@ export async function updateQuestionbyNumber(
       tryoutId,
       questionNumber,
       subtest,
-      answer: convertAnswerToLetter(Number(updatedData.answer)),
+      answer: updatedData.answer,
       explanation: updatedData.explanation,
       imagePath: updatedData.explanationImagePath,
       linkPath: updatedData.linkPath,

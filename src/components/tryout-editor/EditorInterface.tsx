@@ -42,11 +42,9 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
   const [zoomLevel, setZoomLevel] = useState(100);
   const [isEditMode, setIsEditMode] = useState(false);
   const [correctAnswer, setCorrectAnswer] = useState<string | null>(null);
-  console.log(correctAnswer, "correct answer")
 
   const totalQuestions = questionsData.length;
   const currentQuestion = questionsData[currentQuestionIndex];
-  console.log(questionsData)
 
   useEffect(() => {
     if (currentQuestion) {
