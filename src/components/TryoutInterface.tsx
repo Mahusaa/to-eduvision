@@ -45,6 +45,7 @@ export default function TryoutInterface({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [answers, setAnswers] = useState<(string | null)[]>([]);
+  console.log(answers)
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const totalQuestions = allProblem.length;
@@ -190,7 +191,13 @@ export default function TryoutInterface({
                 <Button
                   key={problem.id}
                   variant={index === currentQuestionIndex ? 'default' : 'outline'}
-                  className="h-10 w-10"
+                  className={`
+            h-10 w-10 
+             hover:shadow-md
+            ${answers[index] ? "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500" : ""}
+            ${index === currentQuestionIndex ? "ring-1 ring-offset-1 ring-primary" : ""}
+            ${!answers[index] && index !== currentQuestionIndex ? "hover:border-primary/50" : ""}
+          `}
                   onClick={() => handleQuestionChange(index)}
                 >
                   {problem.questionNumber}
