@@ -214,8 +214,8 @@ export default function TryoutInterface({
                   <Image
                     src={currentQuestion?.imagePath}
                     alt="naga"
-                    width={800}
-                    height={400}
+                    width={400}
+                    height={300}
                     placeholder="blur"
                     blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
                   />
