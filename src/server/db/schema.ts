@@ -1,4 +1,4 @@
-import { relations, SQL, sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
@@ -9,6 +9,7 @@ import {
   varchar,
   serial,
   unique,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
@@ -24,27 +25,8 @@ export const Role = {
  */
 export const createTable = pgTableCreator((name) => `to-eduvision_${name}`);
 
-export const posts = createTable(
-  "post",
-  {
-    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    name: varchar("name", { length: 256 }),
-    createdById: varchar("created_by", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date()
-    ),
-  },
-  (example) => ({
-    createdByIdIdx: index("created_by_idx").on(example.createdById),
-    nameIndex: index("name_idx").on(example.name),
-  })
-);
 
+export const roleEnum = pgEnum('role', ['user', 'admin']);
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -52,7 +34,7 @@ export const users = createTable("user", {
     .default(sql`gen_random_uuid()`),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(),
-  role: varchar("role", { length: 15 }).notNull().default(Role.USER),
+  role: roleEnum('role').notNull().default('user'),
   emailVerified: timestamp("email_verified", {
     mode: "date",
     withTimezone: true,
@@ -140,11 +122,12 @@ export const verificationTokens = createTable(
 
 
 
+export const statusEnum = pgEnum('status', ['closed', 'open', 'completed']);
 export const tryouts = createTable("tryout", {
   id: serial("id").primaryKey(),
   tryoutNumber: integer('tryout_number').notNull(),
   name: varchar('name', { length: 255 }).notNull(),
-  mode: varchar('mode', { length: 255 }).notNull(),
+  status: statusEnum('status').notNull().default('closed'),
   endedAt: timestamp('ended_at').notNull(),
   duration: integer('duration'),
   puDuration: integer('pu_duration').notNull(),

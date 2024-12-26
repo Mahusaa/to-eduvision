@@ -39,8 +39,9 @@ export async function getAllTryout() {
   const allTryout = await db.query.tryouts.findMany({
     columns: {
       id: true,
+      name: true,
       tryoutNumber: true,
-      mode: true,
+      status: true,
       endedAt: true,
       duration: true,
     },
@@ -213,7 +214,6 @@ export async function postCreateTryout(data: {
     name: tryoutName,
     endedAt: new Date(tryoutEnd),
     tryoutNumber,
-    mode: "tutup",
     duration: adjustedDuration,
     puDuration: subtestData.pu?.duration ?? 0,
     pbmDuration: subtestData.pbm?.duration ?? 0,

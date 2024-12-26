@@ -19,7 +19,7 @@ import {
 } from "~/components/ui/select"
 
 
-export function EditTryoutDialog({ tryoutId }: { tryoutId: number }) {
+export function EditTryoutDialog({ tryoutId, children }: { tryoutId: number, children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [selectedSubtest, setSelectedSubtest] = useState("")
   const router = useRouter()
@@ -48,9 +48,7 @@ export function EditTryoutDialog({ tryoutId }: { tryoutId: number }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="w-full">
-          Edit
-        </Button>
+        {children}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

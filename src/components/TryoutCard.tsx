@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 interface TryoutCardProps {
   id: number;
   name: string;
-  mode: boolean;
+  status: string;
   score?: number;
   correctAnswers?: number;
   totalQuestions: number;
@@ -15,12 +15,12 @@ interface TryoutCardProps {
 const TryoutCard = ({
   id,
   name,
-  mode,
+  status,
   score,
   correctAnswers,
   totalQuestions,
 }: TryoutCardProps) => {
-  const percentage = mode && correctAnswers ? Math.round((correctAnswers / totalQuestions) * 100) : 0
+  const percentage = status === "completed" && correctAnswers ? Math.round((correctAnswers / totalQuestions) * 100) : 0
   const ranking = 2
   const totalParticipants = 100
   return (
@@ -28,7 +28,7 @@ const TryoutCard = ({
       <CardHeader className="border-b bg-muted/40 p-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold">{name}</CardTitle>
-          {mode && (
+          {status === "completed" && (
             <span className={`rounded-full px-2 py-1 text-sm ${percentage >= 70 ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
               }`}>
               {correctAnswers}/{totalQuestions}
@@ -38,7 +38,7 @@ const TryoutCard = ({
       </CardHeader>
       <CardContent className="p-4">
         <div className="space-y-4">
-          {mode ? (
+          {status === "completed" ? (
             <>
               <div className="flex justify-between items-center">
                 <div>

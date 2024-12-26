@@ -149,7 +149,6 @@ export default function TryoutForm({ className }: React.ComponentProps<`form`>) 
     setSubtestData((prev) => ({
       ...prev,
       [code]: {
-        // Ensure that both fields are always strings
         duration: prev[code]?.duration ?? "", // Default to empty string if undefined
         total: prev[code]?.total ?? "",       // Default to empty string if undefined
         [field]: value,                       // Update the specific field
@@ -292,7 +291,7 @@ export default function TryoutForm({ className }: React.ComponentProps<`form`>) 
           </Button>
         )}
 
-        {step < 3 ? (
+        {step < 3 && (
           <Button
             type="button"
             onClick={handleNext}
@@ -300,15 +299,18 @@ export default function TryoutForm({ className }: React.ComponentProps<`form`>) 
           >
             Next
           </Button>
-        ) : (
-          <Button
-            type="button"
-            className="bg-green-600 hover:bg-green-700 w-auto"
-            onClick={handleSubmit}
-          >
-            Create Tryout
-          </Button>
         )}
+        {step === 3 &&
+          (
+            <Button
+              type="submit"
+              className="bg-green-600 hover:bg-green-700 w-auto"
+              onClick={handleSubmit}
+            >
+              Create Tryout
+            </Button>
+          )
+        }
       </div>
     </form>
   )
