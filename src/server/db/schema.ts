@@ -13,10 +13,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
-export const Role = {
-  ADMIN: 'admin',
-  USER: 'user',
-} as const;
+
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
  * database instance for multiple projects.
@@ -26,7 +23,7 @@ export const Role = {
 export const createTable = pgTableCreator((name) => `to-eduvision_${name}`);
 
 
-export const roleEnum = pgEnum('role', ['user', 'admin']);
+export const roleEnum = pgEnum('role', ['user', 'admin', 'mulyono']);
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -171,7 +168,6 @@ export const answerKey = createTable("answerKey", {
 }, (table) => ({
   uniqueConstraint: unique('answerKey_unique_constraint').on(table.questionNumber, table.tryoutId, table.subtest),
 })
-
 );
 
 

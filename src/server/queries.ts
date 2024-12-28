@@ -35,6 +35,28 @@ export async function getTryoutById(id: number) {
   return tryoutData;
 }
 
+export async function getAllTryoutById(id: string) {
+  const allTryout = await db.query.tryouts.findMany({
+    columns: {
+      id: true,
+      name: true,
+      tryoutNumber: true,
+      status: true,
+      endedAt: true,
+      duration: true,
+    },
+    with: {
+      userTimes: {
+        where: eq(userTime.userId, id),
+        columns: {
+          userId: true,
+          tryoutEnd: true
+        }
+      }
+    }
+  })
+  return allTryout;
+}
 export async function getAllTryout() {
   const allTryout = await db.query.tryouts.findMany({
     columns: {
@@ -48,10 +70,10 @@ export async function getAllTryout() {
     with: {
       userTimes: {
         columns: {
+          userId: true,
           tryoutEnd: true
         }
       }
-
     }
   })
   return allTryout;
@@ -293,7 +315,11 @@ export async function updateQuestionbyNumber(
         linkPath: updatedData.linkPath,
       }
     })
-
-
 }
 
+
+//Admin 
+export async function getUsers() {
+  const users = await db.query.users.findMany();
+  return users;
+}
