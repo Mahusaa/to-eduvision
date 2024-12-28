@@ -15,7 +15,7 @@ export function DeleteConfirmDialog({ isOpen, onClose, onConfirm, itemName }: De
         <DialogHeader>
           <DialogTitle>Confirm Deletion</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete {itemName}? This action cannot be undone.
+            Apakah anda akan menghapus {itemName}?.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

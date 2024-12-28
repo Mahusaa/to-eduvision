@@ -1,4 +1,3 @@
 
-- [ ] api/submit-asnwer/route.ts (json error)
-- [ ] api/update-subtestend/route.ts (json error)
-- [ ] 
+- [ ] user can see tryout list wether closed, open or completed
+- [ ] calculate user answer and score
