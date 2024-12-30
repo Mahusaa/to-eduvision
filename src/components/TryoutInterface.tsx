@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CircleStop, SendHorizonal, ZoomIn, ZoomOut } from 'lucide-react';
 
 import { Button } from '~/components/ui/button';
 import { Card } from '~/components/ui/card';
@@ -12,6 +12,8 @@ import { TryoutTimer } from './tryout-interface/time';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { z } from 'zod';
+import LogoSVG from 'public/Logo';
+import { FinishTryoutDialog } from './tryout-interface/FinishTryoutDialog';
 
 
 const answerSubmissionSchema = z.object({

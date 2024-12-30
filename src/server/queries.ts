@@ -323,3 +323,39 @@ export async function getUsers() {
   const users = await db.query.users.findMany();
   return users;
 }
+
+
+export async function getAnswerKeyArray(tryoutId: number, subtest: string) {
+  const answerKeyData = await db
+    .select({
+      questionNumber: answerKey.questionNumber,
+      answer: answerKey.answer,
+    })
+    .from(answerKey)
+    .where(and(eq(answerKey.tryoutId, tryoutId), eq(answerKey.subtest, subtest)))
+    .orderBy(answerKey.questionNumber); // Ensure ordered by question number
+
+  const maxQuestionNumber = answerKeyData.reduce(
+    (max, row) => Math.max(max, row.questionNumber),
+    0
+  );
+
+  const answerArray = Array(maxQuestionNumber).fill(undefined);
+
+  answerKeyData.forEach(({ questionNumber, answer }) => {
+    answerArray[questionNumber - 1] = answer ?? undefined;
+  });
+
+  return { tryoutId, subtest, answerArray };
+}
+
+export async function getUserAnswerBySubtest(tryoutId: number, subtest: string) {
+  const rows = await db.select({
+    userId: userAnswer.userId,
+    name: users.name,
+    answer: userAnswer.answerArray,
+  }).from(userAnswer)
+    .innerJoin(users, eq(userAnswer.userId, users.id))
+    .where(and(eq(userAnswer.tryoutId, tryoutId), eq(userAnswer.subtest, subtest)))
+  return rows
+}

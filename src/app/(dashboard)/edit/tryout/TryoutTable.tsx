@@ -4,7 +4,7 @@
 import { startTransition, useActionState, useState } from "react";
 import { Input } from "~/components/ui/input";
 import { Table, TableRow, TableHeader, TableHead, TableBody, TableCell } from "~/components/ui/table";
-import { Filter, Loader2, Pencil, Settings, Trash2 } from "lucide-react";
+import { FileScan, Filter, Loader2, Pencil, Settings, Trash2 } from "lucide-react";
 import { Select, SelectItem, SelectTrigger, SelectContent, SelectValue } from "~/components/ui/select";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -146,6 +146,20 @@ export default function TryoutTable({ tryout }: TryoutData) {
                         className="p-2 w-30 rounded-xl shadow-lg bg-green-50 border border-gray-200"
                       >
                         <p className="text-sm text-gray-700">Edit Subtest</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                    <HoverCard openDelay={100} closeDelay={100}>
+                      <HoverCardTrigger asChild>
+                        <Button variant="outline" size="icon" className="text-blue-300 hover:text-blue-500 hover:bg-blue-50">
+                          <FileScan className="h-4 w-4" />
+                        </Button>
+                      </HoverCardTrigger>
+                      <HoverCardContent
+                        side="top"
+                        align="center"
+                        className="p-2 w-30 rounded-xl shadow-lg bg-blue-50 border border-gray-200"
+                      >
+                        <p className="text-sm text-gray-700">Result</p>
                       </HoverCardContent>
                     </HoverCard>
                     <HoverCard openDelay={100} closeDelay={100}>
