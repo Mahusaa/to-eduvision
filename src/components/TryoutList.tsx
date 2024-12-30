@@ -26,7 +26,6 @@ interface TryoutListProps {
 
 export default function TryoutList({ tryoutData, userId }: TryoutListProps) {
   const router = useRouter();
-  console.log(tryoutData)
 
   const handleStart = async (tryout: Tryout) => {
     if (!tryout.duration) {
@@ -35,7 +34,6 @@ export default function TryoutList({ tryoutData, userId }: TryoutListProps) {
     }
 
     if (tryout.status === 'completed') {
-      alert('Tryout has already been completed.');
       return;
     }
 
@@ -43,7 +41,7 @@ export default function TryoutList({ tryoutData, userId }: TryoutListProps) {
       const currentTime = new Date();
       const tryoutEndTime =
         tryout.userTimes.length > 0
-          ? new Date(tryout.userTimes[0].tryoutEnd || 0)
+          ? new Date(tryout.userTimes[0]?.tryoutEnd ?? 0)
           : new Date(currentTime.getTime() + tryout.duration * 60 * 1000);
 
       if (tryoutEndTime < currentTime) {
@@ -89,7 +87,7 @@ export default function TryoutList({ tryoutData, userId }: TryoutListProps) {
             const currentTime = new Date();
             const isTryoutEnded =
               tryout.userTimes.length > 0 &&
-              new Date(tryout.userTimes[0].tryoutEnd || 0) < currentTime;
+              new Date(tryout.userTimes[0]?.tryoutEnd ?? 0) < currentTime;
 
             return (
               <Card
@@ -160,11 +158,11 @@ export default function TryoutList({ tryoutData, userId }: TryoutListProps) {
                   >
                     {tryout.status === 'open'
                       ? isTryoutEnded
-                        ? 'Completed'
-                        : 'Mulai'
+                        ? 'Menunggu Pembahasan'
+                        : tryout.userTimes[0]?.tryoutEnd ? "Lanjutkan Tryout" : "Mulai Tryout"
                       : tryout.status === 'completed'
                         ? 'Lihat Pembahasan'
-                        : 'Closed'}
+                        : 'Belum Tersedia'}
                   </Button>
                 </CardFooter>
               </Card>

@@ -1,18 +1,15 @@
 import { z } from "zod";
 
-
-
 const updatedDataSchema = z.object({
-  problemDesc: z.string().optional(),
-  option: z.string().optional(),
-  questionImagePath: z.string().optional(),
-  answer: z.string().optional(),
-  explanation: z.string().optional(),
-  explanationImagePath: z.string().optional(),
-  linkPath: z.string().optional(),
+  problemDesc: z.string().nullable().optional(),
+  option: z.string().nullable().optional(),
+  questionImagePath: z.string().nullable().optional(),
+  answer: z.string().nullable().optional(),
+  explanation: z.string().nullable().optional(),
+  explanationImagePath: z.string().nullable().optional(),
+  linkPath: z.string().nullable().optional(),
 });
 
-// Define the schema for the data to send (including tryoutId, subtest, and questionNumber)
 const dataSchema = z.object({
   tryoutId: z.number().positive(),
   subtest: z.string().min(1),
@@ -20,4 +17,5 @@ const dataSchema = z.object({
   updatedData: updatedDataSchema,
 });
 
-export { dataSchema };
+export { dataSchema, updatedDataSchema };
+

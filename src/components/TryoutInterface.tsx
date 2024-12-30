@@ -34,6 +34,7 @@ export default function TryoutInterface({
   tryoutId,
   userId,
   subtestCode,
+  userName,
 }: {
   allProblem: AllProblems[];
   subtestProps: string;
@@ -41,9 +42,11 @@ export default function TryoutInterface({
   tryoutId: number;
   userId: string;
   subtestCode: string,
+  userName?: string | null,
 }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(100);
+  const [isSubmiting, setIsSubmiting] = useState(false)
   const [answers, setAnswers] = useState<(string | null)[]>([]);
   console.log(answers)
   const [isClient, setIsClient] = useState(false);
@@ -112,6 +115,7 @@ export default function TryoutInterface({
   }, [router, userId, tryoutId, subtestCode]);
 
   const handleSubmit = async () => {
+    setIsSubmiting(true)
     try {
       const submissionData = {
         answerArray: answers,
@@ -132,6 +136,7 @@ export default function TryoutInterface({
       if (response.ok) {
         const data = await response.json() as Promise<{ message: string }>;
         console.log('Response from server:', data);
+        setIsSubmiting(false)
         localStorage.removeItem(localStorageKey);
         await handleTimeUp()
       } else {
@@ -162,24 +167,44 @@ export default function TryoutInterface({
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b p-4 sticky top-0 bg-white z-10">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <h1 className="text-emerald-600 font-semibold text-xl">Eduvision</h1>
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-500">Waktu subtest: </div>
+        <div className="flex flex-wrap items-center justify-between max-w-7xl mx-auto">
+          {/* Logo and Title Section */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span>
+              <LogoSVG className="text-primary w-8 h-8" />
+            </span>
+            <span className="text-2xl font-bold text-primary">EDUVISION</span>
+          </div>
+
+          {/* Button Section */}
+          <div className="mt-2 md:mt-0">
+            <FinishTryoutDialog onConfirm={handleSubmit} isSubmitting={isSubmiting}>
+              <Button
+                className="gap-2"
+                variant="destructive"
+              >
+                <CircleStop className="w-4 h-4" />
+                Selesai Pengerjaan
+              </Button>
+            </FinishTryoutDialog>
+          </div>
+
+          {/* Timer Section */}
+          <div className="flex items-center gap-4 mt-2 md:mt-0">
+            <div className="text-sm text-gray-500">Waktu subtest:</div>
             <TryoutTimer subtestEnd={subtestTime} onTimeUp={handleTimeUp} />
           </div>
         </div>
       </header>
 
+
       <main className="max-w-7xl mx-auto p-4 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-3 space-y-4">
-          <Card className="p-4">
+          <Card className="p-4 hidden md:block">
             <div className="space-y-4">
               <div className="bg-gray-200 w-32 h-32 rounded-lg mx-auto" />
               <div className="text-center space-y-2">
-                <div className="font-mono text-sm">23-8394-99-2083</div>
-                <div className="font-semibold">Usamah Hafizh Ammar Zaim</div>
-                <div className="text-sm text-gray-500">Tes Potensi Skolastik</div>
+                <div className="font-semibold">{userName ? userName : "Peserta"}</div>
                 <div className="text-xs text-gray-400">{subtestProps}</div>
               </div>
             </div>
@@ -270,16 +295,7 @@ export default function TryoutInterface({
                     </Button>
                     <span className="text-sm text-gray-500">{zoomLevel}%</span>
                   </div>
-                  <div>{
-                    currentQuestionIndex === totalQuestions - 1 ? (
-                      <Button
-                        className="gap-2"
-                        onClick={handleSubmit}
-                      >
-                        Submit
-                        <ChevronRight className="w-4 h-4" />
-                      </Button>) : ""
-                  }
+                  <div>
                     <Button
                       className="gap-2 mx-4"
                       onClick={() => handleQuestionChange(currentQuestionIndex + 1)}

@@ -165,7 +165,7 @@ export default function TryoutTable({ tryout }: TryoutData) {
                         align="center"
                         className="p-2 w-30 rounded-sm shadow-lg bg-red-50 border border-gray-200"
                       >
-                        <p className="text-sm text-gray-700">Delete Tryout</p>
+                        <p className="text-sm text-gray-700">Delete</p>
                       </HoverCardContent>
                     </HoverCard>
                     <HoverCard openDelay={100} closeDelay={100}>
@@ -181,7 +181,7 @@ export default function TryoutTable({ tryout }: TryoutData) {
                         align="center"
                         className="p-2 w-30 rounded-xl shadow-lg bg-white border border-gray-200"
                       >
-                        <p className="text-sm text-gray-700">Settings Tryout</p>
+                        <p className="text-sm text-gray-700">Settings</p>
                       </HoverCardContent>
                     </HoverCard>
 

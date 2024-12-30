@@ -48,7 +48,7 @@ export const TryoutTimer: React.FC<TryoutTimerProps> = ({
 
   return (
     <div
-      className="text-lg font-bold"
+      className="text-lg font-bold text-primary"
       aria-live="polite"
       role="timer"
     >

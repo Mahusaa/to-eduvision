@@ -17,10 +17,10 @@ interface QuestionsDataProps {
   tryoutId?: number | null | undefined;
   questionNumber?: number | null | undefined;
   subtest: string;
-  problemDesc: string | null;
-  option: string | null
-  questionImagePath: string | null;
-  answer: string | null;
+  problemDesc?: string | null;
+  option?: string | null
+  questionImagePath?: string | null;
+  answer?: string | null;
   explanation: string | null,
   explanationImagePath: string | null;
   linkPath: string | null;
@@ -88,13 +88,10 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
     setQuestionsData((prevData) => {
       const newData = [...prevData];
 
-      // Parse the option array from the current question
       const currentOptions = JSON.parse(newData[currentQuestionIndex].option! ?? '[]');
 
-      // Update the option at the specified index (optionId)
       currentOptions[optionId] = value;
 
-      // Update the question's option property with the modified array
       newData[currentQuestionIndex] = {
         ...newData[currentQuestionIndex],
         option: JSON.stringify(currentOptions),

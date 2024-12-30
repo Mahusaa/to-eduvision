@@ -1,6 +1,6 @@
 import "server-only"
 import { db } from "./db";
-import { answerKey, questions, userAnswer, userTime } from "./db/schema";
+import { answerKey, questions, userAnswer, users, userTime } from "./db/schema";
 import { and, eq, asc } from "drizzle-orm";
 import type { User } from "./db/schema";
 import { tryouts } from "./db/schema";

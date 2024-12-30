@@ -10,6 +10,7 @@ import {
   serial,
   unique,
   pgEnum,
+  boolean,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
@@ -215,7 +216,23 @@ export const userScore = createTable('userScore', {
   userId: varchar('user_id', { length: 255 }).references(() => users.id),
   tryoutId: integer('tryout_id').references(() => tryouts.id),
   totalScore: integer('total_score'),
+  puScore: integer('pu_score'),
+  pbmScore: integer('pbm_score'),
+  ppuScore: integer('ppu_score'),
+  kkScore: integer('kk_score'),
+  lbindScore: integer('lbind_score'),
+  lbingScore: integer('lbing_score'),
+  pmScore: integer('pm_score'),
 });
+
+export const userScoreBinary = createTable('userScoreBinary', {
+  id: serial("id").primaryKey(),
+  userId: varchar('user_id', { length: 255 }).references(() => users.id),
+  tryoutId: integer('tryout_id').references(() => tryouts.id),
+  subtest: varchar('subtest'),
+  questionId: integer('question_id').references(() => questions.id),
+  isCorrect: boolean('is_correct'),
+})
 
 export const userTimeRelations = relations(userTime, ({ one }) => ({
   user: one(users, { fields: [userTime.userId], references: [users.id] }),

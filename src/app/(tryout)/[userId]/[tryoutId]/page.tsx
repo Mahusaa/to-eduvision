@@ -1,7 +1,11 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import TryoutOverview from "~/components/TryoutOverview";
 import { auth } from "~/server/auth";
 import { getTryoutById, getUserTimebyId } from "~/server/queries";
+import Loading from "./loading";
+import { Button } from "~/components/ui/button";
+import Link from "next/link";
 
 export default async function TryoutPage({
   params
@@ -20,12 +24,25 @@ export default async function TryoutPage({
 
   return (
     <>
-      <TryoutOverview
-        tryoutData={tryoutData}
-        tryoutLeft={tryoutLeft}
-        tryoutTime={tryoutTime}
-      />
-    </>)
+      <Suspense fallback={<Loading />}>
+        <Button
+          variant="default"
+        >
+
+          <Link href="/dashboard" className="w-full">
+            BACK
+          </Link>
+        </Button>
+
+        {/* Tryout Overview Component */}
+        <TryoutOverview
+          tryoutData={tryoutData}
+          tryoutLeft={tryoutLeft}
+          tryoutTime={tryoutTime}
+        />
+      </Suspense>
+    </>
+  )
 }
 
 

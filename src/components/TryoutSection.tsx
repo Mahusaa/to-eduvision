@@ -1,6 +1,6 @@
 "use client"
 import { Card, CardContent } from "./ui/card";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Files, Timer } from "lucide-react";
 import { Button } from "./ui/button";
 import type { FC, SVGProps } from "react";
 import { redirect, useParams } from "next/navigation";
@@ -79,7 +79,7 @@ export function SectionCard({ section, isDisabled }: { section: Section; isDisab
             </div>
             <div>
               <h3 className="font-semibold text-lg">{section.title}</h3>
-              <p className="text-sm text-muted-foreground">{`${section.total} soal, ${section.duration} menit`}</p>
+              <p className="text-sm text-muted-foreground flex flex-row items-center gap-1"><Files className="w-3 h-3" />{`${section.total} soal,`}<Timer className="w-3 h-3" />{`${section.duration} menit`}</p>
             </div>
           </div>
           <Button

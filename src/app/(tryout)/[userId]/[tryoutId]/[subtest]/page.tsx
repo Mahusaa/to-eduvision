@@ -2,6 +2,8 @@ import TryoutInterface from "~/components/TryoutInterface";
 import { getProblembySubtest, getUserTimebyId } from "~/server/queries";
 import { redirect } from "next/navigation";
 import { auth } from "~/server/auth";
+import { Suspense } from "react";
+import Loading from "../loading";
 
 
 type Params = Promise<{ subtest: string; userId: string; tryoutId: number }>
@@ -15,6 +17,7 @@ export default async function TryoutInterfacePage(props: { params: Params }) {
   const userTime = await getUserTimebyId(userId, tryoutId);
   const session = await auth()
   if (!session) return redirect("sign-in")
+  const userName = session.user.name
 
 
   const subtestMapping: Record<
@@ -37,15 +40,18 @@ export default async function TryoutInterfacePage(props: { params: Params }) {
   }
 
   return (
+    <Suspense fallback={<Loading />}>
 
-    <TryoutInterface
-      allProblem={allProblem}
-      subtestProps={subtestData.name}
-      subtestTime={subtestData.time}
-      tryoutId={tryoutId}
-      userId={userId}
-      subtestCode={subtestData.code}
-    />
+      <TryoutInterface
+        allProblem={allProblem}
+        subtestProps={subtestData.name}
+        subtestTime={subtestData.time}
+        tryoutId={tryoutId}
+        userId={userId}
+        subtestCode={subtestData.code}
+        userName={userName}
+      />
+    </Suspense>
   );
 }
 
