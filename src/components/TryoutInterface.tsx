@@ -50,7 +50,6 @@ export default function TryoutInterface({
   const [zoomLevel, setZoomLevel] = useState(100);
   const [isSubmiting, setIsSubmiting] = useState(false)
   const [answers, setAnswers] = useState<(string | null)[]>([]);
-  console.log(answers)
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const totalQuestions = allProblem.length;

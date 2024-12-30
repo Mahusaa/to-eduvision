@@ -16,6 +16,7 @@ import type { ActionResponse } from "~/types/delete-tryout";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card";
 import { EditTryoutDialog } from "~/components/EditTryoutDialog";
 import { SettingTryoutDialog } from "~/components/tryout-editor/SettingTryoutDialog";
+import { TryoutResultDialog } from "~/components/admin-interface/TryoutResultDialog";
 
 
 interface Tryout {
@@ -149,11 +150,13 @@ export default function TryoutTable({ tryout }: TryoutData) {
                       </HoverCardContent>
                     </HoverCard>
                     <HoverCard openDelay={100} closeDelay={100}>
-                      <HoverCardTrigger asChild>
-                        <Button variant="outline" size="icon" className="text-blue-300 hover:text-blue-500 hover:bg-blue-50">
-                          <FileScan className="h-4 w-4" />
-                        </Button>
-                      </HoverCardTrigger>
+                      <TryoutResultDialog tryoutId={test.id}>
+                        <HoverCardTrigger asChild>
+                          <Button variant="outline" size="icon" className="text-blue-300 hover:text-blue-500 hover:bg-blue-50">
+                            <FileScan className="h-4 w-4" />
+                          </Button>
+                        </HoverCardTrigger>
+                      </TryoutResultDialog>
                       <HoverCardContent
                         side="top"
                         align="center"

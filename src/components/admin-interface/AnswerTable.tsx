@@ -172,8 +172,6 @@ export default function AnswerTable({ userAnswer, answerKey }: { userAnswer: Use
         </div>
       </div>
     </div>
-
-
   )
 
 }
