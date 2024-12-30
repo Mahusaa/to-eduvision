@@ -1,5 +1,8 @@
 import AnswerTable from "~/components/admin-interface/AnswerTable";
 import { getAnswerKeyArray, getUserAnswerBySubtest } from "~/server/queries";
+import { Button } from "~/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 
 type Params = Promise<{ subtest: string; tryoutId: number }>
 
@@ -28,7 +31,15 @@ export default async function DetailTryout(props: { params: Params }) {
     }))
 
   return (
-    <div className="w-full mx-auto p-4">
+    <div className="w-full mx-auto p-4 ">
+      <Link href={"/edit/tryout"}>
+        <Button
+          variant="ghost"
+          className="mb-3"
+        >
+          <ChevronLeft className="mr-2 w-4 h-4" />
+          Back</Button>
+      </Link>
       <AnswerTable userAnswer={formattedData} answerKey={answerKeyArray} />
     </div>
   )
