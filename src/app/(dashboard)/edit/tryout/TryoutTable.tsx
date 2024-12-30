@@ -17,6 +17,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/h
 import { EditTryoutDialog } from "~/components/EditTryoutDialog";
 import { SettingTryoutDialog } from "~/components/tryout-editor/SettingTryoutDialog";
 import { TryoutResultDialog } from "~/components/admin-interface/TryoutResultDialog";
+import { ResetPasswordDialog } from "~/components/tryout-editor/ResetPasswordDialog";
 
 
 interface Tryout {
@@ -210,6 +211,12 @@ export default function TryoutTable({ tryout }: TryoutData) {
         </Table>
       </div>
       <DeleteConfirmDialog
+        isOpen={!!tryoutToDelete}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        itemName={tryoutToDelete?.name ?? ""}
+      />
+      <ResetPasswordDialog
         isOpen={!!tryoutToDelete}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}

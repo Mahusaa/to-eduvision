@@ -20,13 +20,15 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
-import { Upload, UserPlus, Loader2, Trash2 } from 'lucide-react'
+import { Upload, UserPlus, Loader2, Trash2, KeyRound } from 'lucide-react'
 import type { User } from '~/server/db/schema'
 import { ImportUserDialog } from './ImportUserDialog'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import { DeleteConfirmDialog } from '../tryout-editor/DeleteConfirmDialog'
 import { type ActionResponse } from '~/types/delete-tryout'
 import { deleteUser } from '~/actions/delete-user'
+import { resetUserPass } from '~/actions/reset-password'
+import { ResetPasswordDialog } from '../tryout-editor/ResetPasswordDialog'
 
 const getRoleBadgeColor = (role: User['role']) => {
   switch (role) {
@@ -50,14 +52,22 @@ export default function UserManagement({ users }: { users: User[] }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [rowsPerPage, setRowsPerPage] = useState('10')
   const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [userToReset, setUserToReset] = useState<User | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [deleteState, deleteAction, deleteIsPending] = useActionState(deleteUser, initialState)
+  const [resetPassState, resetPassAction, resetPassIsPending] = useActionState(resetUserPass, initialState)
   const handleDeleteCancel = () => {
     setUserToDelete(null)
   }
+  const handleResetPassCancel = () => {
+    setUserToReset(null)
+  }
 
-  const handleDeleteClick = (user: User) => {
+  const handleUserToDelete = (user: User) => {
     setUserToDelete(user)
+  }
+  const handleUserToReset = (user: User) => {
+    setUserToReset(user)
   }
 
   const handleDeleteConfirm = async () => {
@@ -66,6 +76,14 @@ export default function UserManagement({ users }: { users: User[] }) {
         deleteAction(userToDelete.id)
       })
       setUserToDelete(null)
+    }
+  }
+  const handleResetPass = async () => {
+    if (userToReset) {
+      startTransition(() => {
+        resetPassAction(userToReset.id)
+      })
+      setUserToReset(null)
     }
   }
 
@@ -142,26 +160,48 @@ export default function UserManagement({ users }: { users: User[] }) {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center">
-                  <HoverCard openDelay={100} closeDelay={100}>
-                    <HoverCardTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => handleDeleteClick(user)}
-                        disabled={deleteIsPending && userToDelete?.id === user.id}
+                  <div className="flex items-center justify-center space-x-2">
+                    <HoverCard openDelay={100} closeDelay={100}>
+                      <HoverCardTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="text-yellow-400 hover:text-yellow-700 hover:bg-yellow-50"
+                          onClick={() => handleUserToReset(user)}
+                          disabled={resetPassIsPending && userToReset?.id === user.id}
+                        >
+                          {resetPassIsPending && userToReset?.id === user.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
+                        </Button>
+                      </HoverCardTrigger>
+                      <HoverCardContent
+                        side="top"
+                        align="center"
+                        className="p-2 w-30 rounded-sm shadow-lg bg-yellow-50 border border-gray-200"
                       >
-                        {deleteIsPending && userToDelete?.id === user.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                      </Button>
-                    </HoverCardTrigger>
-                    <HoverCardContent
-                      side="top"
-                      align="center"
-                      className="p-2 w-30 rounded-sm shadow-lg bg-red-50 border border-gray-200"
-                    >
-                      <p className="text-sm text-gray-700">Delete Tryout</p>
-                    </HoverCardContent>
-                  </HoverCard>
+                        <p className="text-sm text-gray-700">Reset Password</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                    <HoverCard openDelay={100} closeDelay={100}>
+                      <HoverCardTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleUserToDelete(user)}
+                          disabled={deleteIsPending && userToDelete?.id === user.id}
+                        >
+                          {deleteIsPending && userToDelete?.id === user.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                        </Button>
+                      </HoverCardTrigger>
+                      <HoverCardContent
+                        side="top"
+                        align="center"
+                        className="p-2 w-30 rounded-sm shadow-lg bg-red-50 border border-gray-200"
+                      >
+                        <p className="text-sm text-gray-700">Delete</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -219,6 +259,13 @@ export default function UserManagement({ users }: { users: User[] }) {
         onConfirm={handleDeleteConfirm}
         itemName={userToDelete?.name ?? ""}
       />
+      <ResetPasswordDialog
+        isOpen={!!userToReset}
+        onClose={handleResetPassCancel}
+        onConfirm={handleResetPass}
+        itemName={userToReset?.name ?? ""}
+      />
+
     </div>
   )
 }
