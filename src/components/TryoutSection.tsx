@@ -24,11 +24,11 @@ export function SectionCard({ section, isDisabled }: { section: Section; isDisab
 
   if (isDisabled) {
     disableCondition = true;
-    buttonText = "Waktu Habis";  // If `isDisabled` is true, all subtests are disabled
+    buttonText = "Waktu Tryout Habis";  // If `isDisabled` is true, all subtests are disabled
   } else if (section.end) {
     if (new Date(section.end) < now) {
       disableCondition = true;
-      buttonText = "Waktu Habis";  // If the end time has passed, disable and show "Waktu Habis"
+      buttonText = "Selesai";  // If the end time has passed, disable and show "Waktu Habis"
     } else {
       buttonText = "Lanjutkan";  // If end time is in the future, we can continue
     }

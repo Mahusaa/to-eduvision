@@ -5,9 +5,10 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { cn } from "~/lib/utils";
 import { Progress } from "~/components/ui/progress";
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { z } from "zod";
+import { useToast } from "~/hooks/use-toast";
 
 // Duration and total for each subtest
 const subtestFields = [
@@ -38,11 +39,13 @@ const tryoutSchema = z.object({
 
 
 export default function TryoutForm({ className }: React.ComponentProps<`form`>) {
-  const [step, setStep] = useState(1);
+  const { toast } = useToast()
+  const [step, setStep] = useState<number>(1);
   const [tryoutName, setTryoutName] = useState<string>("");
   const [tryoutEnd, setTryoutEnd] = useState<string>("");
   const [tryoutNumber, setTryoutNumber] = useState<number>(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const [subtestData, setSubtestData] = useState(
     subtestFields.reduce((acc, field) => {
@@ -87,9 +90,9 @@ export default function TryoutForm({ className }: React.ComponentProps<`form`>) 
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setIsLoading(true)
     const parsedTryoutEnd = new Date(tryoutEnd);
 
-    // Convert subtestData's duration and total to numbers
     const parsedSubtestData = Object.fromEntries(
       Object.entries(subtestData).map(([code, data]) => [
         code,
@@ -125,19 +128,32 @@ export default function TryoutForm({ className }: React.ComponentProps<`form`>) 
       })
       if (response.ok) {
         const result = await response.json() as { message: string };
-        console.log('Tryout created successfully:', result);
-        alert('Tryout created successfully!');
+        toast({
+          title: "Succesfully Created Tryout",
+          description: result.message,
+          variant: "default"
+        })
       } else {
         const error = await response.json() as { message: string };
         console.error('Error:', error.message);
-        alert('Failed to create tryout!');
+        toast({
+          title: "Failed to create tryout",
+          description: "Unexpected Error",
+          variant: "destructive"
+        })
       }
 
     } catch (error) {
       if (error instanceof z.ZodError) {
         console.error(error.errors)
+        toast({
+          title: "Failed to create tryout",
+          description: "Errro In ZOD",
+          variant: "destructive"
+        })
       }
     }
+    setIsLoading(false)
 
   };
 
@@ -170,6 +186,7 @@ export default function TryoutForm({ className }: React.ComponentProps<`form`>) 
               placeholder="Masukkan Nama Tryout"
               value={tryoutName}
               onChange={(e) => setTryoutName(e.target.value)}
+              autoComplete="off"
               required
             />
             {errors.tryoutName && (
@@ -273,7 +290,7 @@ export default function TryoutForm({ className }: React.ComponentProps<`form`>) 
             <h4 className="font-semibold">Subtest Details</h4>
             {subtestFields.map((field) => (
               <p key={field.code}>
-                {field.name}: {subtestData[field.code]?.duration} min, {subtestData[field.code]?.total} questions
+                {field.name}: {subtestData[field.code]?.duration} menit, {subtestData[field.code]?.total} soal
               </p>
             ))}
           </div>
@@ -304,12 +321,21 @@ export default function TryoutForm({ className }: React.ComponentProps<`form`>) 
           (
             <Button
               type="submit"
-              className="bg-green-600 hover:bg-green-700 w-auto"
+              className="bg-green-600 hover:bg-green-700 w-auto flex items-center justify-center"
               onClick={handleSubmit}
+              disabled={isLoading}
             >
-              Create Tryout
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Tryout"
+              )}
             </Button>
           )
+
         }
       </div>
     </form>

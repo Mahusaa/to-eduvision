@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse, type NextRequest } from "next/server";
 import { postCreateTryout, postQuestionsbySubtest } from "~/server/queries";
 
@@ -16,7 +17,6 @@ export async function POST(req: NextRequest) {
 
     // Assuming `postCreateTryout` returns an array with an object that contains `tryoutId`
     const result = await postCreateTryout({ tryoutName, tryoutEnd, tryoutNumber, subtestData });
-    console.log(result[0]?.tryoutId);
 
     const tryoutId = result[0]?.tryoutId;
 
@@ -26,9 +26,10 @@ export async function POST(req: NextRequest) {
     } else {
       throw new Error("Tryout ID is missing.");
     }
+    revalidatePath("/edit/tryout")
 
     // Return a success response
-    return NextResponse.json({ message: 'Tryout Created successfully' }, { status: 200 });
+    return NextResponse.json({ message: `Tryout with name: ${tryoutName} successfully created` }, { status: 200 });
 
   } catch (error) {
     console.error(error);

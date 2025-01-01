@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import Header from "~/components/Header";
 import { auth } from "~/server/auth";
+import { Toaster } from "~/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Tryout Eduvision",
@@ -21,6 +22,7 @@ export default async function RootLayout({
         {/*@ts-expect-error: my User token.role doesnt define in my User */}
         <Header session={session} />
         {children}
+        <Toaster />
       </body>
     </html>
   );

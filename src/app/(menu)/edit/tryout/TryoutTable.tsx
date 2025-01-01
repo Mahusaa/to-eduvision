@@ -4,7 +4,7 @@
 import { startTransition, useActionState, useState } from "react";
 import { Input } from "~/components/ui/input";
 import { Table, TableRow, TableHeader, TableHead, TableBody, TableCell } from "~/components/ui/table";
-import { FileScan, Filter, Loader2, Pencil, Settings, Trash2 } from "lucide-react";
+import { FileScan, Filter, Loader2, Pencil, PlusCircle, Settings, Trash2 } from "lucide-react";
 import { Select, SelectItem, SelectTrigger, SelectContent, SelectValue } from "~/components/ui/select";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -17,7 +17,6 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/h
 import { EditTryoutDialog } from "~/components/EditTryoutDialog";
 import { SettingTryoutDialog } from "~/components/tryout-editor/SettingTryoutDialog";
 import { TryoutResultDialog } from "~/components/admin-interface/TryoutResultDialog";
-import { ResetPasswordDialog } from "~/components/tryout-editor/ResetPasswordDialog";
 
 
 interface Tryout {
@@ -106,7 +105,7 @@ export default function TryoutTable({ tryout }: TryoutData) {
           </Select>
         </div>
         <TryoutMakerDialog>
-          <Button>Buat Tryout</Button>
+          <Button><PlusCircle className="w-4 h-4" />Buat Tryout</Button>
         </TryoutMakerDialog >
       </div>
 
@@ -211,12 +210,6 @@ export default function TryoutTable({ tryout }: TryoutData) {
         </Table>
       </div>
       <DeleteConfirmDialog
-        isOpen={!!tryoutToDelete}
-        onClose={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
-        itemName={tryoutToDelete?.name ?? ""}
-      />
-      <ResetPasswordDialog
         isOpen={!!tryoutToDelete}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}

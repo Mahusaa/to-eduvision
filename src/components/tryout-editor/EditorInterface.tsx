@@ -4,13 +4,14 @@ import { useState, useEffect } from "react"
 import { Button } from "~/components/ui/button"
 import { Label } from "~/components/ui/label"
 import { Card } from "~/components/ui/card"
-import { ChevronRight, ZoomOut, ZoomIn, ChevronLeft, Edit, Save, EyeIcon } from 'lucide-react'
+import { ChevronRight, ZoomOut, ZoomIn, ChevronLeft, Edit, Save, EyeIcon, Loader2 } from 'lucide-react'
 import { Input } from "~/components/ui/input"
 import { Textarea } from "~/components/ui/textarea"
 import { dataSchema } from "~/types/question-exp"
 import { QuestionNavigator } from "./QuestionNavigator"
 import { OptionEditor } from "./OptionEditor"
 import { ImageUploader } from "./ImageUploader"
+import { useToast } from "~/hooks/use-toast"
 
 
 interface QuestionsDataProps {
@@ -37,11 +38,13 @@ interface Option {
 }
 
 export default function EditorInterface({ questionsData: initialQuestionsData }: EditorInterfaceProps) {
+  const { toast } = useToast()
   const [questionsData, setQuestionsData] = useState(initialQuestionsData);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [isEditMode, setIsEditMode] = useState(false);
   const [correctAnswer, setCorrectAnswer] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const totalQuestions = questionsData.length;
   const currentQuestion = questionsData[currentQuestionIndex];
@@ -135,6 +138,7 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true)
     const updatedData = {
       problemDesc: currentQuestion?.problemDesc,
       option: currentQuestion?.option,
@@ -169,13 +173,25 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
 
       const result = await res.json() as { success: boolean, message: string };
       if (result.success) {
-        console.log("Question updated successfully");
+        toast({
+          description: "Succesfully save questions"
+        })
       } else {
-        console.log("Error updating question:", result.message);
+        toast({
+          title: "Oh No! Something went wrong",
+          description: "Error when submitting",
+          variant: "destructive"
+        })
       }
     } catch (error) {
       console.error('Error updating question:', error);
+      toast({
+          title: "Oh No! Something went wrong",
+          description: "Error when submitting",
+          variant: "destructive"
+        })
     }
+    setIsLoading(false)
   };
 
   return (
@@ -308,9 +324,19 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                   <Button
                     className="gap-2 mx-4"
                     onClick={handleSubmit}
+                    disabled={isLoading}
                   >
-                    <Save className="w-4 h-4" />
-                    Save
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        Save
+                      </>
+                    )}
                   </Button>
                 )}
                 <Button

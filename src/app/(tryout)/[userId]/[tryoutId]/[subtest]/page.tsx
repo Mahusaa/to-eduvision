@@ -41,7 +41,6 @@ export default async function TryoutInterfacePage(props: { params: Params }) {
 
   return (
     <Suspense fallback={<Loading />}>
-
       <TryoutInterface
         allProblem={allProblem}
         subtestProps={subtestData.name}
