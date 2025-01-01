@@ -13,7 +13,6 @@ interface TryoutCardProps {
 }
 
 const TryoutCard = ({
-  id,
   name,
   status,
   score,

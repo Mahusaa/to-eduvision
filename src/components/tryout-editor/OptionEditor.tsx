@@ -6,7 +6,7 @@ import { Check } from "lucide-react"
 interface OptionEditorProps {
   options: string[];
   isEditMode: boolean;
-  correctAnswer: string | undefined;
+  correctAnswer: string | undefined | null;
   onOptionChange: (optionId: number, value: string) => void;
   onCorrectAnswerChange: (answerLetter: string) => void;
 }
@@ -22,7 +22,7 @@ export function OptionEditor({
 
   return (
     <RadioGroup
-      value={correctAnswer}
+      value={correctAnswer ? correctAnswer : "P"}
       onValueChange={(value) => onCorrectAnswerChange(value)}
     >
       <div className="space-y-2">

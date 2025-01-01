@@ -1,58 +1,30 @@
-##### DEPENDENCIES
-
-FROM --platform=linux/amd64 node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat openssl
+# Stage 1: Base image with Node.js and pnpm
+FROM node:18-alpine AS base
+RUN npm install -g pnpm
 WORKDIR /app
 
+# Stage 2: Install dependencies
+FROM base AS deps
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
-
-# Install dependencies based on the preferred package manager
-
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml\* ./
-
-RUN \
-    if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-    elif [ -f package-lock.json ]; then npm ci; \
-    elif [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm i; \
-    else echo "Lockfile not found." && exit 1; \
-    fi
-
-##### BUILDER
-
-FROM --platform=linux/amd64 node:20-alpine AS builder
-ARG DATABASE_URL
-ARG NEXT_PUBLIC_CLIENTVAR
-WORKDIR /app
+# Stage 3: Build the application
+FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY . . 
+RUN pnpm run build
 
-# ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN \
-    if [ -f yarn.lock ]; then SKIP_ENV_VALIDATION=1 yarn build; \
-    elif [ -f package-lock.json ]; then SKIP_ENV_VALIDATION=1 npm run build; \
-    elif [ -f pnpm-lock.yaml ]; then npm install -g pnpm && SKIP_ENV_VALIDATION=1 pnpm run build; \
-    else echo "Lockfile not found." && exit 1; \
-    fi
-
-##### RUNNER
-
-FROM --platform=linux/amd64 gcr.io/distroless/nodejs20-debian12 AS runner
+# Stage 4: Production server
+FROM node:18-alpine AS runner
 WORKDIR /app
-
-ENV NODE_ENV production
-
-# ENV NEXT_TELEMETRY_DISABLED 1
-
-COPY --from=builder /app/next.config.js ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
-
+ENV NODE_ENV=production
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/node_modules ./node_modules
+COPY drizzle.config.json ./  # Ensure the drizzle.config.json is copied
 
 EXPOSE 3000
-ENV PORT 3000
 
-CMD ["server.js"]
+# Run migrations and start the server
+CMD ["sh", "-c", "npx drizzle-kit up && node server.js"]
 

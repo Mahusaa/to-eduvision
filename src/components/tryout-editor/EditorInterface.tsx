@@ -18,14 +18,14 @@ import QuestionEditor from "./QuestionEditor"
 interface QuestionsDataProps {
   tryoutId?: number | null | undefined;
   questionNumber?: number | null | undefined;
-  subtest: string;
+  subtest?: string | null;
   problemDesc?: string | null;
   option?: string | null
   questionImagePath?: string | null;
   answer?: string | null;
-  explanation: string | null,
-  explanationImagePath: string | null;
-  linkPath: string | null;
+  explanation?: string | null,
+  explanationImagePath?: string | null;
+  linkPath?: string | null;
 }
 
 interface EditorInterfaceProps {
@@ -52,13 +52,14 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
 
   useEffect(() => {
     if (currentQuestion) {
-      setCorrectAnswer(currentQuestion.answer);
+      setCorrectAnswer(currentQuestion.answer ? currentQuestion.answer : "P");
     }
   }, [currentQuestion]);
 
-  const options: Option[] = currentQuestion?.option
-    ? JSON.parse(currentQuestion.option)
+  const options: string[] = currentQuestion?.option
+    ? JSON.parse(currentQuestion.option) as string[]
     : [];
+
 
   const handleQuestionChange = (index: number) => {
     if (index >= 0 && index < totalQuestions) {
@@ -91,9 +92,13 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
   const handleOptionChange = (optionId: number, value: string) => {
     setQuestionsData((prevData) => {
       const newData = [...prevData];
+      if (!newData[currentQuestionIndex]) {
+        return prevData; // Return the original data if index is invalid
+      }
 
-      const currentOptions = JSON.parse(newData[currentQuestionIndex].option! ?? '[]');
-
+      const currentOptions: string[] = JSON.parse(
+        newData[currentQuestionIndex].option ?? '[]'
+      ) as string[]
       currentOptions[optionId] = value;
 
       newData[currentQuestionIndex] = {
