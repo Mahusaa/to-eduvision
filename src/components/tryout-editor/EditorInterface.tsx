@@ -12,6 +12,7 @@ import { QuestionNavigator } from "./QuestionNavigator"
 import { OptionEditor } from "./OptionEditor"
 import { ImageUploader } from "./ImageUploader"
 import { useToast } from "~/hooks/use-toast"
+import QuestionEditor from "./QuestionEditor"
 
 
 interface QuestionsDataProps {
@@ -186,10 +187,10 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
     } catch (error) {
       console.error('Error updating question:', error);
       toast({
-          title: "Oh No! Something went wrong",
-          description: "Error when submitting",
-          variant: "destructive"
-        })
+        title: "Oh No! Something went wrong",
+        description: "Error when submitting",
+        variant: "destructive"
+      })
     }
     setIsLoading(false)
   };
@@ -224,14 +225,16 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                   Soal {currentQuestion?.questionNumber}
                 </h2>
                 {isEditMode ? (
-                  <Textarea
-                    value={currentQuestion?.problemDesc ?? ''}
-                    onChange={(e) => handleInputChange('problemDesc', e.target.value)}
-                    className="w-full"
+
+                  <QuestionEditor
+                    problemDesc={currentQuestion?.problemDesc}
+                    handleInputChange={handleInputChange}
                   />
                 ) : (
-                  <p>{currentQuestion?.problemDesc}</p>
-                )}
+                  <div
+                    className="prose prose-sm max-w-none p-4"
+                    dangerouslySetInnerHTML={{ __html: currentQuestion?.problemDesc ?? '' }}
+                  />)}
               </div>
 
               <ImageUploader
@@ -240,6 +243,7 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                 onFileChange={(file) => handleImageUpload('question', file)}
                 altText="Question"
               />
+              <p>{questionsData[currentQuestionIndex]?.questionImagePath}</p>
 
               <OptionEditor
                 options={options}

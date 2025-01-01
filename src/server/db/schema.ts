@@ -151,7 +151,7 @@ export const questions = createTable("question", {
   tryoutId: integer('tryout_id').references(() => tryouts.id),
   questionNumber: integer('question_number').notNull(),
   subtest: varchar('subtest', { length: 20 }).notNull(),
-  problemDesc: varchar('problem_desc'),
+  problemDesc: text('problem_desc'),
   option: varchar('option'),
   imagePath: varchar("image_path"),
 });

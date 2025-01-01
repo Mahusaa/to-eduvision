@@ -57,6 +57,17 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+  .prose {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5; /* Adjust for less spacing */
+}
+
+.prose-sm {
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
 }
 @layer base {
   * {
