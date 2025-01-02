@@ -6,6 +6,7 @@ import { getTryoutById, getUserTimebyId } from "~/server/queries";
 import Loading from "./loading";
 import { Button } from "~/components/ui/button";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default async function TryoutPage({
   params
@@ -25,15 +26,6 @@ export default async function TryoutPage({
   return (
     <>
       <Suspense fallback={<Loading />}>
-        <Button
-          variant="default"
-        >
-
-          <Link href="/dashboard" className="w-full">
-            BACK
-          </Link>
-        </Button>
-
         {/* Tryout Overview Component */}
         <TryoutOverview
           tryoutData={tryoutData}

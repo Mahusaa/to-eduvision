@@ -79,7 +79,7 @@ export function SectionCard({ section, isDisabled }: { section: Section; isDisab
             </div>
             <div>
               <h3 className="font-semibold text-lg">{section.title}</h3>
-              <p className="text-sm text-muted-foreground flex flex-row items-center gap-1"><Files className="w-3 h-3" />{`${section.total} soal,`}<Timer className="w-3 h-3" />{`${section.duration} menit`}</p>
+              <p className="text-sm text-muted-foreground flex flex-row items-center gap-1"><Files className="w-3 h-3 text-primary" />{`${section.total} soal,`}<Timer className="w-3 h-3 text-primary" />{`${section.duration} menit`}</p>
             </div>
           </div>
           <Button

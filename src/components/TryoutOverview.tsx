@@ -2,9 +2,11 @@
 "use client"
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
-import { Timer, BookOpen, Brain, Calculator, Languages, School } from 'lucide-react'
+import { Timer, ArrowLeft, BookOpen, Brain, Calculator, Languages, School, SquareRadical } from 'lucide-react'
 import { SectionCard } from './TryoutSection'
 import type { TryoutData, UserTime } from '~/server/db/schema'
+import { Button } from './ui/button'
+import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import formatTime from '~/lib/format-time'
 import { Loader2 } from 'lucide-react'
@@ -65,7 +67,7 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
         title: 'Kemampuan Kuantitatif',
         total: kkTotal,
         duration: kkDuration,
-        icon: School,
+        icon: SquareRadical,
         color: 'text-green-500',
         code: "kk",
         end: tryoutTime.kkEnd,
@@ -75,7 +77,7 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
         title: 'Pemahaman Bacaan dan Menulis',
         total: pbmTotal,
         duration: pbmDuration,
-        icon: Calculator,
+        icon: BookOpen,
         color: 'text-yellow-500',
         code: "pbm",
         end: tryoutTime.pbmEnd,
@@ -86,7 +88,7 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
         total: ppuTotal,
         duration: ppuDuration,
         icon: School,
-        color: 'text-green-500',
+        color: 'text-purple-500',
         code: "ppu",
         end: tryoutTime.ppuEnd,
         sectionId: tryoutTime.id,
@@ -129,8 +131,17 @@ export default function TryoutOverview({ tryoutData, tryoutLeft, tryoutTime }: {
 
 
   return (
-    <div className="bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="bg-gray-50 p-2">
+      <div className="max-w-4xl mx-auto space-y-2">
+        {/* Back Button */}
+        <Button variant="ghost">
+          <Link href="/dashboard" className="inline-flex items-center gap-2 text-primary hover:underline">
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Back</span>
+          </Link>
+        </Button>
+
+        {/* Main Card */}
         <Card className="border-none shadow-lg">
           <CardHeader className="bg-primary text-primary-foreground rounded-t-lg">
             <div className="flex justify-between items-center">
