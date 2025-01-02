@@ -8,7 +8,7 @@ import { Suspense } from "react";
 
 export default async function Page() {
   const session = await auth();
-  if (!session) redirect("/")
+  if (!session) redirect("/sign-in")
   const userId = session?.user.id
   const tryoutData = await getAllTryoutById(userId)
   return (

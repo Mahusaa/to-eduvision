@@ -2,6 +2,8 @@ import AnswerTable from "~/components/admin-interface/AnswerTable";
 import { getAnswerKeyArray, getUserAnswerBySubtest } from "~/server/queries";
 import { Button } from "~/components/ui/button";
 import { ChevronLeft } from "lucide-react";
+import { auth } from "~/server/auth";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 
 type Params = Promise<{ subtest: string; tryoutId: number }>
@@ -14,6 +16,9 @@ interface User {
 }
 
 export default async function DetailTryout(props: { params: Params }) {
+  const session = await auth()
+  if (!(session?.user.role === "admin" || session?.user.role === "mulyono")) return redirect("/dashboard");
+
   const params = await props.params
   const subtest = params.subtest
   const tryoutId = params.tryoutId

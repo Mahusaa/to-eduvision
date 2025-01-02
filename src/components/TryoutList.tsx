@@ -80,7 +80,7 @@ export default function TryoutList({ tryoutData, userId }: TryoutListProps) {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div>
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {tryoutData.map((tryout) => {
