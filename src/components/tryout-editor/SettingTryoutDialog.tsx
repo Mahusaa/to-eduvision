@@ -43,7 +43,7 @@ export function SettingTryoutDialog({ children, tryout }: { children: React.Reac
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Test</DialogTitle>
+          <DialogTitle>Edit Tryout</DialogTitle>
         </DialogHeader>
         <form action={action}>
           <div className="space-y-4">
@@ -159,7 +159,7 @@ export function SettingTryoutDialog({ children, tryout }: { children: React.Reac
                 Loading...
               </>
             ) : (
-              "Save Test"
+              "Save Tryout"
             )}
           </Button>
 

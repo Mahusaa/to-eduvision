@@ -29,6 +29,7 @@ import { type ActionResponse } from '~/types/delete-tryout'
 import { deleteUser } from '~/actions/delete-user'
 import { resetUserPass } from '~/actions/reset-password'
 import { ResetPasswordDialog } from '../tryout-editor/ResetPasswordDialog'
+import { CreateUserDialog } from './CreateUserDialog'
 
 const getRoleBadgeColor = (role: User['role']) => {
   switch (role) {
@@ -119,10 +120,12 @@ export default function UserManagement({ users }: { users: User[] }) {
               Import Users
             </Button>
           </ImportUserDialog>
-          <Button>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Add User
-          </Button>
+          <CreateUserDialog>
+            <Button>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add User
+            </Button>
+          </CreateUserDialog>
         </div>
       </div>
 
