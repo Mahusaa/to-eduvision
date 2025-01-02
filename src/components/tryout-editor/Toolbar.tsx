@@ -130,11 +130,32 @@ function Toolbar({ editor }: ToolbarProps) {
           tooltip: "Add Image",
           isActive: () => editor.isActive({ undo: 'undo' }),
           onClick: () => {
-            const filePath = prompt("Enter the image path")
-            if (filePath) {
-              editor.chain().focus().setImage({ src: filePath }).run();
-            }
-          },
+            // Create an input element for file selection
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*'; // Accept only image files
+
+            fileInput.onchange = () => {
+              const file = fileInput.files![0]; // Get the selected file
+              if (file) {
+                const reader = new FileReader();
+
+                // Read the file as a data URL
+                reader.onload = () => {
+                  const filePath = reader.result; // This is the base64-encoded data URL of the image
+                  if (typeof filePath === "string") {
+                    editor.chain().focus().setImage({ src: filePath }).run();
+
+                  }
+                };
+
+                reader.readAsDataURL(file); // Trigger the reading process
+              }
+            };
+
+            fileInput.click();
+          }
+
         },
         {
           icon: Undo2,
@@ -166,7 +187,7 @@ function Toolbar({ editor }: ToolbarProps) {
                       variant="ghost"
                       size="sm"
                       onClick={item.onClick}
-                      className={`h-8 w-8 p-0 ${item.isActive() ? 'bg-muted-foreground/20' : ''
+                      className={`h-8 w-8 p-0 hover:bg-muted-foreground/20 ${item.isActive() ? 'bg-muted-foreground/20' : ''
                         }`}
                     >
                       <item.icon className="h-4 w-4" />

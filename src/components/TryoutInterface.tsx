@@ -241,7 +241,10 @@ export default function TryoutInterface({
                   <h2 className="text-lg font-semibold">
                     Soal {currentQuestion!.questionNumber}
                   </h2>
-                  <p>{currentQuestion!.problemDesc}</p>
+                  <div
+                    className="prose prose-sm max-w-none p-4"
+                    dangerouslySetInnerHTML={{ __html: currentQuestion?.problemDesc ?? '' }}
+                  />
                 </div>
                 {currentQuestion?.imagePath &&
                   <Image

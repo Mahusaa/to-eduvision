@@ -7,6 +7,7 @@ import Dropcursor from '@tiptap/extension-dropcursor'
 import Image from '@tiptap/extension-image'
 import TextAlign from '@tiptap/extension-text-align'
 import Heading from '@tiptap/extension-heading';
+import ImageResize from 'tiptap-extension-resize-image';
 import { Toolbar } from './Toolbar'
 
 
@@ -34,9 +35,13 @@ const QuestionEditor = ({ problemDesc, handleInputChange }: QuestionEditorProps)
     extensions: [StarterKit,
       TextStyle,
       Dropcursor,
-      Image,
+      ImageResize,
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+      }),
       TextAlign.configure({
-        types: ['heading', 'paragraf']
+        types: ['heading', 'paragraph']
       }),
       Heading.configure({
         levels: [1, 2, 3, 4, 5, 6]
@@ -57,13 +62,13 @@ const QuestionEditor = ({ problemDesc, handleInputChange }: QuestionEditorProps)
     return null
   }
   return (
-    <>
+    <div className="flex flex-col justify-center">
       <Toolbar editor={editor} />
       <EditorContent
         editor={editor}
-        className="p-4 outline-none focus:ring-2 focus:ring-blue-500 rounded bg-gray-50 shadow-md min-h-[150px]"
       />
-    </>
+    </div>
+
   )
 }
 

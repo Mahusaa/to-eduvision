@@ -248,7 +248,6 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                 onFileChange={(file) => handleImageUpload('question', file)}
                 altText="Question"
               />
-              <p>{questionsData[currentQuestionIndex]?.questionImagePath}</p>
 
               <OptionEditor
                 options={options}
