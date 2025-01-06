@@ -1,5 +1,5 @@
 # Stage 1: Base image with Node.js and pnpm
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 RUN npm install -g pnpm
 WORKDIR /app
 
@@ -13,6 +13,7 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . . 
 RUN pnpm run build
+RUN pnpm run db:push
 
 # Stage 4: Production server
 FROM node:18-alpine AS runner
@@ -21,10 +22,9 @@ ENV NODE_ENV=production
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules ./node_modules
-COPY drizzle.config.json ./  # Ensure the drizzle.config.json is copied
 
 EXPOSE 3000
 
 # Run migrations and start the server
-CMD ["sh", "-c", "npx drizzle-kit up && node server.js"]
+CMD ["node","server.js"]
 

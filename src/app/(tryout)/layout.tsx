@@ -6,9 +6,9 @@ import { auth } from "~/server/auth";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Eduvision",
-  description: "Eduvision Tryout",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  title: "Tryout Eduvision | Platform Belajar menuju SNBT 2025",
+  description: "Mau lolos PTN impian? EduVision siap jadi partner belajar kamu! Dengan tutor kece, metode belajar anti boring, dan tips UTBK yang relatable banget, EduVision bikin belajar jadi lebih seru dan maksimal.",
+  icons: [{ rel: "icon", url: "/favicons.ico" }],
 };
 
 export default async function RootLayout({

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import * as React from "react"
+import { useTransition } from 'react'
 import { NavigationMenuLink, NavigationMenuItem, NavigationMenu, NavigationMenuList, NavigationMenuTrigger, NavigationMenuContent, navigationMenuTriggerStyle } from './ui/navigation-menu'
 import { Button } from './ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from './ui/dropdown-menu'
@@ -9,6 +10,7 @@ import LogoSVG from 'public/Logo';
 import { cn } from '~/lib/utils'
 import { LogOut, User } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
+import { logoutAction } from '~/actions/logout-action'
 type User = {
   name?: string | null;
   email: string;
@@ -23,6 +25,12 @@ type Session = {
 
 
 const Header = ({ session }: { session: Session | null }) => {
+  const [isPending, startTransition] = useTransition()
+  const handleLogout = () => {
+    startTransition(async () => {
+      await logoutAction()
+    })
+  }
 
   return (
     <header className="bg-gradient-to-b from-blue-50 to-white border-b shadow-sm">
@@ -116,6 +124,8 @@ const Header = ({ session }: { session: Session | null }) => {
                   </Link>
                   <DropdownMenuItem
                     className="!text-red-500 !hover:text-red-500 hover:bg-red-50"
+                    onClick={handleLogout}
+                    disabled={isPending}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>

@@ -1,5 +1,6 @@
 'use client'
 
+import { Loader2 } from 'lucide-react'
 import { startTransition, useState, useTransition } from 'react'
 import { Button } from '~/components/ui/button'
 
@@ -11,18 +12,22 @@ export default function LoginForm({ loginAction }: LoginPageProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [isLoading, setLoading] = useState<boolean>(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    setLoading(true)
 
 
     startTransition(() => loginAction(email, password))
 
     if (!email || !password) {
       setError('Please fill in all fields')
+      setLoading(false)
       return
     }
+    setLoading(false)
   }
 
   return (
@@ -91,9 +96,18 @@ export default function LoginForm({ loginAction }: LoginPageProps) {
         <Button
           type="submit"
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
+          disabled={isLoading}
         >
-          Sign in
+          {isLoading ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="w-4 h-4" />
+              Loading...
+            </span>
+          ) : (
+            "Sign in"
+          )}
         </Button>
+
       </div>
     </form>
   )

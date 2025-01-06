@@ -4,9 +4,6 @@ import TryoutOverview from "~/components/TryoutOverview";
 import { auth } from "~/server/auth";
 import { getTryoutById, getUserTimebyId } from "~/server/queries";
 import Loading from "./loading";
-import { Button } from "~/components/ui/button";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 
 export default async function TryoutPage({
   params

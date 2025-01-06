@@ -3,12 +3,13 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
 import { Badge } from '~/components/ui/badge';
-import { Trophy, Star, Clock, Users } from 'lucide-react';
+import { Trophy, Star, Clock, Users, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Tryout {
   id: number;
   tryoutNumber: number;
+  name: string;
   status: 'closed' | 'open' | 'completed';
   score?: number;
   rank?: number;
@@ -97,7 +98,7 @@ export default function TryoutList({ tryoutData, userId }: TryoutListProps) {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-xl font-bold">
-                      Tryout {tryout.tryoutNumber}
+                      {tryout.name} {tryout.tryoutNumber}
                     </CardTitle>
                     <Badge
                     >
@@ -152,7 +153,7 @@ export default function TryoutList({ tryoutData, userId }: TryoutListProps) {
                     onClick={() =>
                       tryout.status === 'open' && !isTryoutEnded
                         ? handleStart(tryout)
-                        : alert('This tryout has already ended or is closed.')
+                        : alert('Pembahasan Belum tersedia')
                     }
                     disabled={tryout.status === 'closed'}
                   >
@@ -161,7 +162,7 @@ export default function TryoutList({ tryoutData, userId }: TryoutListProps) {
                         ? 'Menunggu Pembahasan'
                         : tryout.userTimes[0]?.tryoutEnd ? "Lanjutkan Tryout" : "Mulai Tryout"
                       : tryout.status === 'completed'
-                        ? 'Lihat Pembahasan'
+                        ? (<><Lock className="w-4 h-4" /> Lihat Pembahasan </>)
                         : 'Belum Tersedia'}
                   </Button>
                 </CardFooter>

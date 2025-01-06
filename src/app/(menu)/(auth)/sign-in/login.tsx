@@ -14,7 +14,6 @@ export async function loginAction(email: string, password: string) {
     throw new Error('User not found'); // Handle error appropriately
   }
 
-  console.log(credential);
 
   redirect('/');
 }
