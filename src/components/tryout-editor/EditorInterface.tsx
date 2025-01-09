@@ -11,8 +11,8 @@ import { dataSchema } from "~/types/question-exp"
 import { QuestionNavigator } from "./QuestionNavigator"
 import { OptionEditor } from "./OptionEditor"
 import { useToast } from "~/hooks/use-toast"
-import QuestionEditor from "./QuestionEditor"
 import { processMathInHtml } from "~/lib/math-utils"
+import InputEditor from "./InputEditor"
 
 
 interface QuestionsDataProps {
@@ -194,9 +194,10 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                 </h2>
                 {isEditMode ? (
 
-                  <QuestionEditor
-                    problemDesc={currentQuestion?.problemDesc}
+                  <InputEditor
+                    input={currentQuestion?.problemDesc}
                     handleInputChange={handleInputChange}
+                    type="problemDesc"
                   />
                 ) : (
                   <div
