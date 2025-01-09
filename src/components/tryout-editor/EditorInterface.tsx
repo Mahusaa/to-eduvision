@@ -6,7 +6,7 @@ import { Label } from "~/components/ui/label"
 import { Card } from "~/components/ui/card"
 import { ChevronRight, ZoomOut, ZoomIn, ChevronLeft, Edit, Save, EyeIcon, Loader2 } from 'lucide-react'
 import { Input } from "~/components/ui/input"
-import { Textarea } from "~/components/ui/textarea"
+import { Separator } from "../ui/separator"
 import { dataSchema } from "~/types/question-exp"
 import { QuestionNavigator } from "./QuestionNavigator"
 import { OptionEditor } from "./OptionEditor"
@@ -193,12 +193,14 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                   Soal {currentQuestion?.questionNumber}
                 </h2>
                 {isEditMode ? (
-
-                  <InputEditor
-                    input={currentQuestion?.problemDesc}
-                    handleInputChange={handleInputChange}
-                    type="problemDesc"
-                  />
+                  <>
+                    <Label>Description</Label>
+                    <InputEditor
+                      input={currentQuestion?.problemDesc}
+                      handleInputChange={handleInputChange}
+                      type="problemDesc"
+                    />
+                  </>
                 ) : (
                   <div
                     className="prose prose-sm max-w-none p-4"
@@ -218,12 +220,11 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
               {isEditMode && (
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="explanation">Explanation</Label>
-                    <Textarea
-                      id="explanation"
-                      value={currentQuestion?.explanation ?? ''}
-                      onChange={(e) => handleInputChange('explanation', e.target.value)}
-                      className="w-full"
+                    <Label>Explanation</Label>
+                    <InputEditor
+                      input={currentQuestion?.explanation}
+                      handleInputChange={handleInputChange}
+                      type="explanation"
                     />
                   </div>
                   <div>
