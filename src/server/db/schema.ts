@@ -11,6 +11,7 @@ import {
   unique,
   pgEnum,
   boolean,
+  decimal,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
@@ -166,6 +167,7 @@ export const answerKey = createTable("answerKey", {
   explanation: varchar("explanation"),
   imagePath: varchar("image_path"),
   linkPath: varchar("link"),
+  weight: decimal("weight"),
 }, (table) => ({
   uniqueConstraint: unique('answerKey_unique_constraint').on(table.questionNumber, table.tryoutId, table.subtest),
 })
