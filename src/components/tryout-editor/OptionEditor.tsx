@@ -2,6 +2,8 @@ import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
 import { Label } from "~/components/ui/label"
 import { Input } from "~/components/ui/input"
 import { Check } from "lucide-react"
+import { processMathInHtml } from "~/lib/math-utils"
+import OptionInput from "./OptionInput"
 
 interface OptionEditorProps {
   options: string[];
@@ -37,12 +39,10 @@ export function OptionEditor({
             />
             {isEditMode ? (
               <div className="flex items-center space-x-2 flex-grow">
-                <Input
-                  value={option}
-                  onChange={(e) =>
-                    onOptionChange(index, e.target.value)
-                  }
-                  className={`flex-1 ${optionLetters[index] === correctAnswer ? 'border-green-500' : ''}`}
+                <OptionInput
+                  optionLabel={option}
+                  index={index}
+                  handleInputChange={onOptionChange}
                 />
                 {optionLetters[index] === correctAnswer && (
                   <Check className="text-green-500" size={20} />
@@ -51,11 +51,17 @@ export function OptionEditor({
             ) : (
               <Label
                 htmlFor={`option-${index}`}
-                className={correctAnswer === optionLetters[index] ? "font-bold text-green-600" : ""}
+                className={`${correctAnswer === optionLetters[index] ? "font-bold text-green-600" : ""
+                  }`}
               >
-                {option}
-                {correctAnswer === optionLetters[index] && " (Correct)"}
+                <div
+                  className={`prose prose-sm ${correctAnswer === optionLetters[index] && "text-green-600"}`}
+                  dangerouslySetInnerHTML={{
+                    __html: processMathInHtml(option) ?? "",
+                  }}
+                />
               </Label>
+
             )}
           </div>
         ))}
