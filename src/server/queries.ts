@@ -324,6 +324,28 @@ export async function getUsers() {
   return users;
 }
 
+export async function getUserTimebyTryoutId(tryoutId: number) {
+  const result = await db.select({
+    id: userTime.id,
+    userId: userTime.userId,
+    tryoutEnd: userTime.tryoutEnd,
+    puEnd: userTime.puEnd,
+    pbmEnd: userTime.pbmEnd,
+    ppuEnd: userTime.ppuEnd,
+    kkEnd: userTime.kkEnd,
+    lbindEnd: userTime.lbindEnd,
+    lbingEnd: userTime.lbingEnd,
+    pmEnd: userTime.pmEnd,
+    userName: users.name,
+    tryoutName: tryouts.name,
+    tryoutNumber: tryouts.tryoutNumber,
+  })
+    .from(userTime)
+    .innerJoin(users, eq(userTime.userId, users.id))
+    .innerJoin(tryouts, eq(userTime.tryoutId, tryouts.id))
+    .where(eq(userTime.tryoutId, tryoutId))
+  return result
+}
 
 export async function getAnswerKeyArray(tryoutId: number, subtest: string) {
   const answerKeyData = await db
@@ -359,3 +381,4 @@ export async function getUserAnswerBySubtest(tryoutId: number, subtest: string) 
     .where(and(eq(userAnswer.tryoutId, tryoutId), eq(userAnswer.subtest, subtest)))
   return rows
 }
+

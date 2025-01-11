@@ -1,10 +1,9 @@
 'use server'
 
-import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod'
 import { db } from '~/server/db';
-import { tryouts, users } from '~/server/db/schema';
+import { users } from '~/server/db/schema';
 import { type ActionResponse, type CreateUserFormData } from '~/types/create-user';
 
 
