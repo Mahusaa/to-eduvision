@@ -6,6 +6,7 @@ import { db } from "~/server/db";
 import { users, accounts, sessions, verificationTokens } from "~/server/db/schema";
 import { getUserByEmail } from "../queries";
 import { verifyPassword } from "~/lib/auth-utils";
+import { z } from 'zod';
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -31,40 +32,19 @@ declare module "next-auth" {
 export const authConfig = {
   providers: [
     CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: {
-          label: "email:",
-          type: "text",
-          placeholder: "abcd@gmail.com"
-        },
-        password: {
-          label: "Password:",
-          type: "password",
-          placeholder: "your-awesome-password"
-        }
-      },
       async authorize(credentials) {
-        const email = credentials?.email as string | null
-        const password = credentials?.password as string | null;
-
-
-        if (!email || !password) {
-          console.log("Email or password is missing");
-          return null;
+        const parsedCredentials = z
+          .object({ email: z.string().email(), password: z.string().min(6) })
+          .safeParse(credentials);
+        if (parsedCredentials.success) {
+          const { email, password } = parsedCredentials.data;
+          const user = await getUserByEmail(email);
+          if (!user) return null;
+          const passwordsMatch = await verifyPassword(password, user.password!)
+          if (passwordsMatch) return user;
         }
-        const user = await getUserByEmail(email)
-        if (!user) {
-          console.log("User not found");
-          return null;
-        }
-        const isPasswordValid = await verifyPassword(password, user.password!);
-        if (isPasswordValid) {
-          return user;
-        } else {
-          console.log("Invalid password");
-          return null;
-        }
+        console.log('Invalid credentials');
+        return null;
       }
     })
   ],
