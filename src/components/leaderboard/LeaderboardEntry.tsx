@@ -13,6 +13,7 @@ interface LeaderboardEntryProps {
   sortBy: number
 }
 
+const labels = ["Penalaran Umum", "Kemampuan Kuantitatif", "Pemahaman Bacaan dan Menulis", "Pengetahuan dan Pemahaman Umum", "Literasi Bahasa Indonesia", "Literasi Bahasa Inggris", "Penalaran Matematika"];
 export default function LeaderboardEntry({ entry, rank, sortBy }: LeaderboardEntryProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const averageScore = entry.scores.reduce((sum, score) => sum + score, 0) / entry.scores.length
@@ -48,7 +49,7 @@ export default function LeaderboardEntry({ entry, rank, sortBy }: LeaderboardEnt
               className={`p-2 rounded text-sm ${sortBy === index ? 'bg-blue-100 border-2 border-blue-500' : 'bg-gray-100'
                 }`}
             >
-              <span className="font-semibold">ST {index + 1}:</span> {score}
+              <span className="font-semibold">{labels[index]}: </span> {score}
             </div>
           ))}
         </div>
