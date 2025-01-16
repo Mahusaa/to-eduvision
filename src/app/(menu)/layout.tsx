@@ -18,7 +18,7 @@ export default async function RootLayout({
   const session = await auth()
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body className="flex flex-col h-screen bg-white">
+      <body className="flex flex-col h-screen ">
         {/*@ts-expect-error: my User token.role doesnt define in my User */}
         <Header session={session} />
         {children}
