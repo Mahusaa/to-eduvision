@@ -1,9 +1,10 @@
 import "server-only"
 import { db } from "./db";
-import { answerKey, questions, userAnswer, users, userTime } from "./db/schema";
+import { answerKey, questionCalculation, questions, userAnswer, users, userTime, userScore } from "./db/schema";
 import { and, eq, asc } from "drizzle-orm";
 import type { User } from "./db/schema";
 import { tryouts } from "./db/schema";
+import type { CalculationResult } from "~/types/irt-calculation";
 
 
 type SubtestData = Record<string, { duration: number; total: number }>;
@@ -382,3 +383,83 @@ export async function getUserAnswerBySubtest(tryoutId: number, subtest: string) 
   return rows
 }
 
+
+//IRT calculations
+
+export async function postQuestionsScore(calculationResults: CalculationResult[]) {
+  for (const result of calculationResults) {
+    await db.insert(questionCalculation).values({
+      tryoutId: result.tryoutId,
+      questionNumber: result.questionNumber,
+      subtest: result.subtest,
+      trueAnswer: result.trueAnswer,
+      totalAnswer: result.totalAnswer,
+      score: result.score.toString(),
+    }).onConflictDoUpdate({
+      target: [questionCalculation.tryoutId, questionCalculation.subtest, questionCalculation.questionNumber],
+      set: {
+        trueAnswer: result.trueAnswer,
+        totalAnswer: result.totalAnswer,
+        score: result.score.toString(),
+      }
+    })
+  }
+}
+
+export async function postSubtestScore(users: { userId: string | null, tryoutId: number, subtestScore: number }[], subtest: string) {
+
+  const columnMap: Record<string, string> = {
+    pu: "puScore",
+    pbm: "pbmScore",
+    ppu: "ppuScore",
+    kk: "kkScore",
+    lbind: "lbindScore",
+    lbing: "lbingScore",
+    pm: "pmScore",
+  };
+
+  const columnToUpdate = columnMap[subtest];
+  if (!columnToUpdate) {
+    throw new Error(`Invalid subtest type: ${subtest}`);
+  }
+
+
+  for (const user of users) {
+    if (!user.userId) {
+      console.warn("Skipping user with null userId");
+      continue;
+    }
+    await db.insert(userScore)
+      .values({
+        userId: user.userId,
+        tryoutId: user.tryoutId,
+        [columnToUpdate]: user.subtestScore,
+      })
+      .onConflictDoUpdate({
+        target: [userScore.userId, userScore.tryoutId],
+        set: {
+          [columnToUpdate]: user.subtestScore,
+        }
+      })
+  }
+}
+
+export async function getAllUserScore(tryoutId: number) {
+  const result = await db
+    .select({
+      userName: users.name,
+      userId: userScore.userId,
+      tryoutId: userScore.tryoutId,
+      puScore: userScore.puScore,
+      pbmScore: userScore.pbmScore,
+      ppuScore: userScore.ppuScore,
+      kkScore: userScore.kkScore,
+      lbindScore: userScore.lbindScore,
+      lbingScore: userScore.lbingScore,
+      pmScore: userScore.pmScore,
+    })
+    .from(userScore)
+    .innerJoin(users, eq(userScore.userId, users.id))
+    .where(eq(userScore.tryoutId, tryoutId));
+  return result;
+}
