@@ -212,7 +212,7 @@ export default function TryoutInterface({
           </Card>
           <Card className="p-4">
             <h2 className="font-semibold mb-2">Nomor Soal</h2>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="sm:flex sm:gap-2 sm:overflow-x-auto sm:whitespace-nowrap lg:grid lg:grid-cols-5 gap-2">
               {allProblem.map((problem, index) => (
                 <Button
                   key={problem.id}
