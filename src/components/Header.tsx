@@ -73,7 +73,7 @@ const Header = ({ session }: { session: Session | null }) => {
                 </div>
 
                 {/* Navigation Menu for Larger Screens */}
-                <NavigationMenu className="hidden lg:flex">
+                <NavigationMenu className="hidden md:block lg:flex">
                   <NavigationMenuList>
                     <NavigationMenuItem>
                       <Link href="/dashboard" legacyBehavior passHref>
@@ -93,7 +93,7 @@ const Header = ({ session }: { session: Session | null }) => {
                       <NavigationMenuItem>
                         <NavigationMenuTrigger>Admin</NavigationMenuTrigger>
                         <NavigationMenuContent>
-                          <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[300px] lg:grid-cols-[.75fr_1fr]">
+                          <ul className="grid gap-3 pt-4 md:w-[400px] lg:w-[400px] lg:grid-cols-[.75fr_1fr]">
                             <li className="row-span-3">
                               <NavigationMenuLink asChild>
                                 <Link
