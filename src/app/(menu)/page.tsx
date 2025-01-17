@@ -62,7 +62,7 @@ export default async function HomePage() {
             <div className="mt-8 flex justify-center lg:mt-0 lg:flex-shrink-0">
               <div className="inline-flex rounded-md shadow">
                 <Button asChild size="lg" className="w-full sm:w-auto">
-                  <Link href="/sign-up">
+                  <Link href="https://bit.ly/TryOutEduvision">
                     Daftar sekarang aja ! <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                   </Link>
                 </Button>

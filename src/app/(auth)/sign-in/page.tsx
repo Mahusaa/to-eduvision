@@ -27,7 +27,7 @@ export default async function LoginPage() {
         <p className="mt-2 text-sm text-gray-600">
           Belum punya akun?{' '}
           <a
-            href="#"
+            href="https://bit.ly/TryOutEduvision"
             className="font-medium text-indigo-600 hover:underline hover:text-indigo-500"
           >
             Daftar Sekarang
