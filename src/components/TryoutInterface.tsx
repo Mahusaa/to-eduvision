@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, CircleStop, SendHorizonal, ZoomIn, ZoomOut } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CircleStop, ZoomIn, ZoomOut } from 'lucide-react';
 
 import { Button } from '~/components/ui/button';
 import { Card } from '~/components/ui/card';
@@ -10,10 +10,11 @@ import { Label } from '~/components/ui/label';
 import type { AllProblems } from '~/server/db/schema';
 import { TryoutTimer } from './tryout-interface/time';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { z } from 'zod';
 import LogoSVG from 'public/Logo';
 import { FinishTryoutDialog } from './tryout-interface/FinishTryoutDialog';
+import { processMathInHtml } from '~/lib/math-utils';
+import { useToast } from '~/hooks/use-toast';
 
 
 const answerSubmissionSchema = z.object({
@@ -51,6 +52,7 @@ export default function TryoutInterface({
   const [isSubmiting, setIsSubmiting] = useState(false)
   const [answers, setAnswers] = useState<(string | null)[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const { toast } = useToast();
   const router = useRouter();
   const totalQuestions = allProblem.length;
 
@@ -87,6 +89,49 @@ export default function TryoutInterface({
       return Math.min(Math.max(newZoom, 50), 200);
     });
   };
+
+  const handleSave = async () => {
+    try {
+      const submissionData = {
+        answerArray: answers,
+        subtest: subtestCode,
+        userId,
+        tryoutId: Number(tryoutId),
+      };
+      answerSubmissionSchema.parse(submissionData);
+
+      const response = await fetch('/api/submit-answer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      if (response.ok) {
+        const data = await response.json() as Promise<{ message: string }>;
+        console.log('Response from server:', data);
+      } else {
+        console.error('Error submitting answers');
+        alert('Failed to submit answers.');
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Failed to submit",
+          description: "Check your connection",
+          variant: 'destructive'
+        })
+        alert('Validation failed. Please check your data.');
+      } else {
+        toast({
+          title: "Failed to submit",
+          description: "Check your connection",
+          variant: 'destructive'
+        })
+      }
+    }
+  }
 
   const handleTimeUp = useCallback(async () => {
     try {
@@ -193,7 +238,7 @@ export default function TryoutInterface({
           {/* Timer Section */}
           <div className="flex items-center gap-4 mt-2 md:mt-0">
             <div className="text-sm text-gray-500">Waktu subtest:</div>
-            <TryoutTimer subtestEnd={subtestTime} onTimeUp={handleTimeUp} />
+            <TryoutTimer subtestEnd={subtestTime} onTimeUp={handleTimeUp} onSave={handleSave} />
           </div>
         </div>
       </header>
@@ -212,7 +257,7 @@ export default function TryoutInterface({
           </Card>
           <Card className="p-4">
             <h2 className="font-semibold mb-2">Nomor Soal</h2>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="sm:flex sm:gap-2 sm:overflow-x-auto sm:whitespace-nowrap lg:grid lg:grid-cols-5 gap-2">
               {allProblem.map((problem, index) => (
                 <Button
                   key={problem.id}
@@ -243,20 +288,9 @@ export default function TryoutInterface({
                   </h2>
                   <div
                     className="prose prose-sm max-w-none p-4"
-                    dangerouslySetInnerHTML={{ __html: currentQuestion?.problemDesc ?? '' }}
+                    dangerouslySetInnerHTML={{ __html: processMathInHtml(currentQuestion?.problemDesc ?? "") }}
                   />
                 </div>
-                {currentQuestion?.imagePath &&
-                  <Image
-                    src={currentQuestion?.imagePath}
-                    alt="naga"
-                    width={400}
-                    height={300}
-                    placeholder="blur"
-                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-                  />
-                }
-
                 <RadioGroup value={answers[currentQuestionIndex] ?? ''} onValueChange={handleAnswerChange}>
                   <div className="space-y-2">
                     {options.map((option: string, index: number) => (
@@ -265,7 +299,14 @@ export default function TryoutInterface({
                           value={optionLetters[index]!} // Assign letter value (A, B, C, etc.)
                           id={`option-${index}`}
                         />
-                        <Label htmlFor={`option-${index}`}>{option}</Label>
+                        <Label htmlFor={`option-${index}`}>
+                          <div
+                            className="prose prose-sm"
+                            dangerouslySetInnerHTML={{
+                              __html: processMathInHtml(option) ?? "",
+                            }}
+                          />
+                        </Label>
                       </div>
                     ))}
                   </div>

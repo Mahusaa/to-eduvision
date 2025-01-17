@@ -4,7 +4,7 @@
 import { startTransition, useActionState, useState } from "react";
 import { Input } from "~/components/ui/input";
 import { Table, TableRow, TableHeader, TableHead, TableBody, TableCell } from "~/components/ui/table";
-import { FileScan, Filter, Loader2, Pencil, PlusCircle, Settings, Trash2 } from "lucide-react";
+import { AlarmClock, ChartNoAxesCombined, FileScan, Filter, Loader2, Pencil, PlusCircle, Settings, Trash2 } from "lucide-react";
 import { Select, SelectItem, SelectTrigger, SelectContent, SelectValue } from "~/components/ui/select";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -17,6 +17,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/h
 import { EditTryoutDialog } from "~/components/EditTryoutDialog";
 import { SettingTryoutDialog } from "~/components/tryout-editor/SettingTryoutDialog";
 import { TryoutResultDialog } from "~/components/admin-interface/TryoutResultDialog";
+import Link from "next/link";
 
 
 interface Tryout {
@@ -163,6 +164,48 @@ export default function TryoutTable({ tryout }: TryoutData) {
                         className="p-2 w-30 rounded-xl shadow-lg bg-blue-50 border border-gray-200"
                       >
                         <p className="text-sm text-gray-700">Result</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                    <HoverCard openDelay={100} closeDelay={100}>
+                      <HoverCardTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="text-purple-500 hover:text-purple-700 hover:bg-purple-50"
+                          asChild
+                        >
+                          <Link href={`/edit/scoring/${test.id}`} >
+                            <ChartNoAxesCombined className="w-4 h-4" />
+                          </Link>
+                        </Button>
+                      </HoverCardTrigger>
+                      <HoverCardContent
+                        side="top"
+                        align="center"
+                        className="p-2 w-30 rounded-sm shadow-lg bg-purple-50 border border-gray-200"
+                      >
+                        <p className="text-sm text-gray-700">IRT Scoring</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                    <HoverCard openDelay={100} closeDelay={100}>
+                      <HoverCardTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="text-yellow-500 hover:text-yellow-700 hover:bg-yellow-50"
+                          asChild
+                        >
+                          <Link href={`/edit/user-time/${test.id}`} >
+                            <AlarmClock className="w-4 h-4" />
+                          </Link>
+                        </Button>
+                      </HoverCardTrigger>
+                      <HoverCardContent
+                        side="top"
+                        align="center"
+                        className="p-2 w-30 rounded-sm shadow-lg bg-yellow-50 border border-gray-200"
+                      >
+                        <p className="text-sm text-gray-700">User Time</p>
                       </HoverCardContent>
                     </HoverCard>
                     <HoverCard openDelay={100} closeDelay={100}>

@@ -11,6 +11,7 @@ import {
   unique,
   pgEnum,
   boolean,
+  decimal,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
@@ -172,18 +173,18 @@ export const answerKey = createTable("answerKey", {
 );
 
 
-export const answerSum = createTable("answerSum", {
+export const questionCalculation = createTable('questionCalculation', {
   id: serial("id").primaryKey(),
   tryoutId: integer('tryout_id').references(() => tryouts.id),
-  puSum: integer('pu_sum').notNull(),
-  pbmSum: integer('pbm_sum').notNull(),
-  ppuSum: integer('ppu_sum').notNull(),
-  kkSum: integer('kk_sum').notNull(),
-  lbindSum: integer('lbind_sum').notNull(),
-  lbingSum: integer('lbing_sum').notNull(),
-  pmSum: integer('pm_sum').notNull(),
-  totalUser: integer("total_user").notNull(),
-});
+  questionNumber: integer('question_number').notNull(),
+  subtest: varchar('subtest', { length: 20 }).notNull(),
+  trueAnswer: integer('trueAnswer'),
+  totalAnswer: integer('totalAnswer'),
+  score: decimal('score'),
+}, (table) => ({
+  uniqueQC: unique('unique_qc').on(table.questionNumber, table.tryoutId, table.subtest), //uniqueQuestionsCalculation
+}))
+
 
 export const userAnswer = createTable('userAnswer', {
   id: serial("id").primaryKey(),
@@ -215,15 +216,17 @@ export const userScore = createTable('userScore', {
   id: serial("id").primaryKey(),
   userId: varchar('user_id', { length: 255 }).references(() => users.id),
   tryoutId: integer('tryout_id').references(() => tryouts.id),
-  totalScore: integer('total_score'),
-  puScore: integer('pu_score'),
-  pbmScore: integer('pbm_score'),
-  ppuScore: integer('ppu_score'),
-  kkScore: integer('kk_score'),
-  lbindScore: integer('lbind_score'),
-  lbingScore: integer('lbing_score'),
-  pmScore: integer('pm_score'),
-});
+  puScore: decimal('pu_score'),
+  pbmScore: decimal('pbm_score'),
+  ppuScore: decimal('ppu_score'),
+  kkScore: decimal('kk_score'),
+  lbindScore: decimal('lbind_score'),
+  lbingScore: decimal('lbing_score'),
+  pmScore: decimal('pm_score'),
+}, (table) => ({
+  uniqueConstraint: unique('unique_sc').on(table.userId, table.tryoutId),
+})
+);
 
 export const userScoreBinary = createTable('userScoreBinary', {
   id: serial("id").primaryKey(),

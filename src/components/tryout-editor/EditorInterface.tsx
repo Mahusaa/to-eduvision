@@ -6,13 +6,13 @@ import { Label } from "~/components/ui/label"
 import { Card } from "~/components/ui/card"
 import { ChevronRight, ZoomOut, ZoomIn, ChevronLeft, Edit, Save, EyeIcon, Loader2 } from 'lucide-react'
 import { Input } from "~/components/ui/input"
-import { Textarea } from "~/components/ui/textarea"
+import { Separator } from "../ui/separator"
 import { dataSchema } from "~/types/question-exp"
 import { QuestionNavigator } from "./QuestionNavigator"
 import { OptionEditor } from "./OptionEditor"
-import { ImageUploader } from "./ImageUploader"
 import { useToast } from "~/hooks/use-toast"
-import QuestionEditor from "./QuestionEditor"
+import { processMathInHtml } from "~/lib/math-utils"
+import InputEditor from "./InputEditor"
 
 
 interface QuestionsDataProps {
@@ -30,12 +30,6 @@ interface QuestionsDataProps {
 
 interface EditorInterfaceProps {
   questionsData: QuestionsDataProps[];
-}
-
-interface Option {
-  value: string;
-  id: string;
-  description?: string;
 }
 
 export default function EditorInterface({ questionsData: initialQuestionsData }: EditorInterfaceProps) {
@@ -110,39 +104,6 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
     });
   };
 
-
-  const handleImageUpload = async (imageType: 'question' | 'explanation', file: File) => {
-    const details = `${imageType}-${questionsData[0]?.tryoutId}-${questionsData[0]?.subtest}-${currentQuestionIndex + 1}`;
-
-    const data = new FormData();
-    data.append('file', file)
-    data.append('details', details)
-
-    try {
-      const res = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: data,
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-      const result = await res.json() as { success: boolean; message: string; path: string }
-      const { path } = result
-
-      setQuestionsData(prevData => {
-        const newData = [...prevData];
-        newData[currentQuestionIndex] = {
-          ...newData[currentQuestionIndex],
-          [imageType === 'question' ? 'questionImagePath' : 'explanationImagePath']: path
-        };
-        return newData;
-      });
-
-      console.log(`${imageType} image uploaded successfully!`);
-    } catch (e) {
-      console.error("Error during file upload:", e);
-    }
-  };
-
   const handleSubmit = async () => {
     setIsLoading(true)
     const updatedData = {
@@ -200,6 +161,8 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
     setIsLoading(false)
   };
 
+
+
   return (
     <main className="max-w-7xl mx-auto p-4 grid grid-cols-1 md:grid-cols-12 gap-6">
       <div className="md:col-span-3 space-y-4">
@@ -230,24 +193,21 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                   Soal {currentQuestion?.questionNumber}
                 </h2>
                 {isEditMode ? (
-
-                  <QuestionEditor
-                    problemDesc={currentQuestion?.problemDesc}
-                    handleInputChange={handleInputChange}
-                  />
+                  <>
+                    <Label>Description</Label>
+                    <InputEditor
+                      input={currentQuestion?.problemDesc}
+                      handleInputChange={handleInputChange}
+                      type="problemDesc"
+                    />
+                  </>
                 ) : (
                   <div
                     className="prose prose-sm max-w-none p-4"
-                    dangerouslySetInnerHTML={{ __html: currentQuestion?.problemDesc ?? '' }}
+                    dangerouslySetInnerHTML={{ __html: processMathInHtml(currentQuestion?.problemDesc ?? "") }}
                   />)}
               </div>
 
-              <ImageUploader
-                isEditMode={isEditMode}
-                imagePath={currentQuestion?.questionImagePath}
-                onFileChange={(file) => handleImageUpload('question', file)}
-                altText="Question"
-              />
 
               <OptionEditor
                 options={options}
@@ -260,12 +220,11 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
               {isEditMode && (
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="explanation">Explanation</Label>
-                    <Textarea
-                      id="explanation"
-                      value={currentQuestion?.explanation ?? ''}
-                      onChange={(e) => handleInputChange('explanation', e.target.value)}
-                      className="w-full"
+                    <Label>Explanation</Label>
+                    <InputEditor
+                      input={currentQuestion?.explanation}
+                      handleInputChange={handleInputChange}
+                      type="explanation"
                     />
                   </div>
                   <div>
@@ -277,12 +236,6 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                       className="w-full"
                     />
                   </div>
-                  <ImageUploader
-                    isEditMode={isEditMode}
-                    imagePath={currentQuestion?.explanationImagePath}
-                    onFileChange={(file) => handleImageUpload('explanation', file)}
-                    altText="Explanation"
-                  />
                 </div>
               )}
 

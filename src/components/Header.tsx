@@ -8,7 +8,7 @@ import { Button } from './ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from './ui/dropdown-menu'
 import LogoSVG from 'public/Logo';
 import { cn } from '~/lib/utils'
-import { LogOut, User } from 'lucide-react'
+import { LogOut, User, Menu } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 import { logoutAction } from '~/actions/logout-action'
 type User = {
@@ -42,61 +42,96 @@ const Header = ({ session }: { session: Session | null }) => {
               <span className="text-2xl font-bold text-primary">EDUVISION</span>
             </Link>
             {session && (
-              <NavigationMenu >
-                <NavigationMenuList>
-                  <NavigationMenuItem>
-                    <Link href="/dashboard" legacyBehavior passHref>
-                      <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                        Dashboard
-                      </NavigationMenuLink>
-                    </Link>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <Link href="/analitik" legacyBehavior passHref>
-                      <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                        Analitik
-                      </NavigationMenuLink>
-                    </Link>
-                  </NavigationMenuItem>
-                  {session.user.role === "admin" && (
-                    <NavigationMenuItem>
-                      <NavigationMenuTrigger>Admin</NavigationMenuTrigger>
-                      <NavigationMenuContent>
-                        <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[300px] lg:grid-cols-[.75fr_1fr">
-                          <li className="row-span-3">
-                            <NavigationMenuLink asChild>
-                              <Link
-                                href="/edit/tryout"
-                                className="block select-none space-y-1 rounded-md p-3  transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                              >
-                                <div className="text-sm font-medium leading-none">Tryout</div>
-                                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                                  Edit tryout content and settings
-                                </p>
-                              </Link>
-                            </NavigationMenuLink>
-                          </li>
-                          <li>
-                            <NavigationMenuLink asChild>
-                              <Link
-                                href="/edit/users"
-                                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                              >
-                                <div className="text-sm font-medium leading-none">Users</div>
-                                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                                  Manage user accounts and permissions
-                                </p>
-                              </Link>
-                            </NavigationMenuLink>
-                          </li>
-                        </ul>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  )}
-                </NavigationMenuList>
-              </NavigationMenu>
-            )}
+              <>
+                {/* Dropdown Menu for Small Screens */}
+                <div className="sm:hidden ml-44">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="p-2">
+                        <Menu className="w-6 h-6" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="start">
+                      <Link href="/dashboard">
+                        <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                      </Link>
+                      <Link href="/analitik">
+                        <DropdownMenuItem>Analitik</DropdownMenuItem>
+                      </Link>
+                      {session.user.role === "admin" && (
+                        <>
+                          <Link href="/edit/tryout">
+                            <DropdownMenuItem>Tryout</DropdownMenuItem>
+                          </Link>
+                          <Link href="/edit/users">
+                            <DropdownMenuItem>Users</DropdownMenuItem>
+                          </Link>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
 
+                {/* Navigation Menu for Larger Screens */}
+                <NavigationMenu className="hidden md:block lg:flex">
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <Link href="/dashboard" legacyBehavior passHref>
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                          Dashboard
+                        </NavigationMenuLink>
+                      </Link>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <Link href="/analitik" legacyBehavior passHref>
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                          Analitik
+                        </NavigationMenuLink>
+                      </Link>
+                    </NavigationMenuItem>
+                    {session.user.role === "admin" && (
+                      <NavigationMenuItem>
+                        <NavigationMenuTrigger>Admin</NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                          <ul className="grid gap-3 pt-4 md:w-[400px] lg:w-[400px] lg:grid-cols-[.75fr_1fr]">
+                            <li className="row-span-3">
+                              <NavigationMenuLink asChild>
+                                <Link
+                                  href="/edit/tryout"
+                                  className="block select-none space-y-1 rounded-md p-3 transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                >
+                                  <div className="text-sm font-medium leading-none">
+                                    Tryout
+                                  </div>
+                                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                    Edit tryout content and settings
+                                  </p>
+                                </Link>
+                              </NavigationMenuLink>
+                            </li>
+                            <li>
+                              <NavigationMenuLink asChild>
+                                <Link
+                                  href="/edit/users"
+                                  className="block select-none space-y-1 rounded-md p-3 transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                >
+                                  <div className="text-sm font-medium leading-none">
+                                    Users
+                                  </div>
+                                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                    Manage user accounts and permissions
+                                  </p>
+                                </Link>
+                              </NavigationMenuLink>
+                            </li>
+                          </ul>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    )}
+                  </NavigationMenuList>
+                </NavigationMenu>
+              </>
+            )}
           </div>
 
 

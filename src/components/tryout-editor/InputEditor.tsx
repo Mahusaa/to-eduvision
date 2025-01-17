@@ -25,11 +25,12 @@ interface QuestionsDataProps {
 }
 
 type QuestionEditorProps = {
-  problemDesc?: string | null,
+  input?: string | null,
   handleInputChange: (field: keyof QuestionsDataProps, value: string) => void;
+  type: "problemDesc" | "explanation";
 };
 
-const QuestionEditor = ({ problemDesc, handleInputChange }: QuestionEditorProps) => {
+const InputEditor = ({ input, handleInputChange, type }: QuestionEditorProps) => {
 
   const editor = useEditor({
     extensions: [StarterKit,
@@ -48,10 +49,10 @@ const QuestionEditor = ({ problemDesc, handleInputChange }: QuestionEditorProps)
       })
 
     ],
-    content: problemDesc ? problemDesc : "",
+    content: input ? input : "",
     onUpdate: ({ editor }) => {
       const updatedContent = editor.getHTML();
-      handleInputChange("problemDesc", updatedContent)
+      handleInputChange(type, updatedContent)
     },
     immediatelyRender: false,
     shouldRerenderOnTransaction: false,
@@ -72,5 +73,5 @@ const QuestionEditor = ({ problemDesc, handleInputChange }: QuestionEditorProps)
   )
 }
 
-export default QuestionEditor
+export default InputEditor
 

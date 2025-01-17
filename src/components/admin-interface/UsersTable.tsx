@@ -30,6 +30,7 @@ import { deleteUser } from '~/actions/delete-user'
 import { resetUserPass } from '~/actions/reset-password'
 import { ResetPasswordDialog } from '../tryout-editor/ResetPasswordDialog'
 import { CreateUserDialog } from './CreateUserDialog'
+import { useToast } from '~/hooks/use-toast'
 
 const getRoleBadgeColor = (role: User['role']) => {
   switch (role) {

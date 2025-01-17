@@ -6,13 +6,18 @@ import formatTime from '~/lib/format-time';
 interface TryoutTimerProps {
   subtestEnd: Date | null;
   onTimeUp?: () => void;
+  onSave?: () => void;
 }
 
 export const TryoutTimer: React.FC<TryoutTimerProps> = ({
   subtestEnd,
-  onTimeUp
+  onTimeUp,
+  onSave,
 }) => {
   const [timeLeft, setTimeLeft] = useState<number>(5000);
+  const [isTwoMinuteSaveTriggered, setTwoMinuteSaveTriggered] = useState<boolean>(false);
+  const [isOneMinuteSaveTriggered, setOneMinuteSaveTriggered] = useState<boolean>(false);
+  const [isTenSecondSaveTriggered, setTenSecondSaveTriggered] = useState<boolean>(false);
 
   useEffect(() => {
     if (subtestEnd) {
@@ -24,13 +29,11 @@ export const TryoutTimer: React.FC<TryoutTimerProps> = ({
       const initialTime = Math.max(0, Math.floor(remainingMilliseconds / 1000));
       setTimeLeft(initialTime);
 
-      // Handle case where time is already up
       if (initialTime <= 0) {
         if (onTimeUp) onTimeUp(); // Call onTimeUp if time is already up
         return;
       }
 
-      // Start countdown timer
       const timer = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
@@ -38,13 +41,29 @@ export const TryoutTimer: React.FC<TryoutTimerProps> = ({
             if (onTimeUp) onTimeUp();
             return 0;
           }
+          // Trigger onSave 2 minutes before time is up
+          if (prevTime === 120 && !isTwoMinuteSaveTriggered) {
+            if (onSave) onSave();
+            setTwoMinuteSaveTriggered(true);
+          }
+
+          // Trigger onSave 1 minute before time is up
+          if (prevTime === 60 && !isOneMinuteSaveTriggered) {
+            if (onSave) onSave();
+            setOneMinuteSaveTriggered(true);
+          }
+          // Trigger onSave 1 minute before time is up
+          if (prevTime === 10 && !isTenSecondSaveTriggered) {
+            if (onSave) onSave();
+            setTenSecondSaveTriggered(true);
+          }
           return prevTime - 1;
         });
       }, 1000);
 
       return () => clearInterval(timer);
     }
-  }, [subtestEnd, onTimeUp]);
+  }, [subtestEnd, onTimeUp, onSave, isTwoMinuteSaveTriggered, isOneMinuteSaveTriggered, isTenSecondSaveTriggered]);
 
   return (
     <div
