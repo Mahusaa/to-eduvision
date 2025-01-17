@@ -1,6 +1,9 @@
 import Leaderboard from "~/components/leaderboard/Leaderboard";
-import { LeaderboardEntryType } from "~/components/leaderboard/LeaderboardEntry";
+import type { LeaderboardEntryType } from "~/components/leaderboard/LeaderboardEntry";
 import { getAllUserScore } from "~/server/queries";
+import { Button } from "~/components/ui/button";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
 type Params = Promise<{ tryoutId: number }>
 export default async function Page(props: { params: Params }) {
@@ -21,13 +24,26 @@ export default async function Page(props: { params: Params }) {
     ],
   }));
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-6 px-4 sm:py-12 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-white  px-4  sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-bold text-center text-primary mb-4 sm:mb-8">Leaderboard Tryout</h1>
-        <p className="text-center text-gray-600 mb-6 sm:mb-8 px-4">
+        <Link href="/dashboard">
+          <Button
+            variant="ghost"
+            className="mb-3 text-gray-700 hover:text-gray-900 px-0"
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+        </Link>
+        <h1 className="text-3xl sm:text-4xl font-bold text-center text-[#1855F3] mb-4 sm:mb-6">
+          Leaderboard Tryout
+        </h1>
+        <p className="text-center text-gray-600 mb-8 sm:mb-10 max-w-2xl mx-auto">
           View top performers across 7 subtests. Sort by average score or individual subtest scores.
         </p>
-          <Leaderboard data={leaderboardData}/>
+        <div className="bg-[#1855F3] rounded-lg p-6">
+          <Leaderboard data={leaderboardData} />
+        </div>
       </div>
     </main>
   )
