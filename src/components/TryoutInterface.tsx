@@ -14,6 +14,7 @@ import { z } from 'zod';
 import LogoSVG from 'public/Logo';
 import { FinishTryoutDialog } from './tryout-interface/FinishTryoutDialog';
 import { processMathInHtml } from '~/lib/math-utils';
+import { useToast } from '~/hooks/use-toast';
 
 
 const answerSubmissionSchema = z.object({
@@ -51,6 +52,7 @@ export default function TryoutInterface({
   const [isSubmiting, setIsSubmiting] = useState(false)
   const [answers, setAnswers] = useState<(string | null)[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const { toast } = useToast();
   const router = useRouter();
   const totalQuestions = allProblem.length;
 
@@ -87,6 +89,49 @@ export default function TryoutInterface({
       return Math.min(Math.max(newZoom, 50), 200);
     });
   };
+
+  const handleSave = async () => {
+    try {
+      const submissionData = {
+        answerArray: answers,
+        subtest: subtestCode,
+        userId,
+        tryoutId: Number(tryoutId),
+      };
+      answerSubmissionSchema.parse(submissionData);
+
+      const response = await fetch('/api/submit-answer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      if (response.ok) {
+        const data = await response.json() as Promise<{ message: string }>;
+        console.log('Response from server:', data);
+      } else {
+        console.error('Error submitting answers');
+        alert('Failed to submit answers.');
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Failed to submit",
+          description: "Check your connection",
+          variant: 'destructive'
+        })
+        alert('Validation failed. Please check your data.');
+      } else {
+        toast({
+          title: "Failed to submit",
+          description: "Check your connection",
+          variant: 'destructive'
+        })
+      }
+    }
+  }
 
   const handleTimeUp = useCallback(async () => {
     try {
@@ -193,7 +238,7 @@ export default function TryoutInterface({
           {/* Timer Section */}
           <div className="flex items-center gap-4 mt-2 md:mt-0">
             <div className="text-sm text-gray-500">Waktu subtest:</div>
-            <TryoutTimer subtestEnd={subtestTime} onTimeUp={handleTimeUp} />
+            <TryoutTimer subtestEnd={subtestTime} onTimeUp={handleTimeUp} onSave={handleSave} />
           </div>
         </div>
       </header>
