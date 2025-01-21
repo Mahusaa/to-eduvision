@@ -38,7 +38,7 @@ export async function calculateIRT(step: number, prevState: prevState, tryoutId:
       const answerDataPU = await getAnswerKeyArray(tryoutId, "pu")
       const allUserAnswerPU = await getUserAnswerBySubtest(tryoutId, "pu")
       const answerArrayPU = answerDataPU.answerArray as string[];
-      const resultScorePU = calculateQuestionScore(answerDataPU, allUserAnswerPU, 12, 0.4)
+      const resultScorePU = calculateQuestionScore(answerDataPU, allUserAnswerPU, 7, 0.4)
       await postQuestionsScore(resultScorePU)
       const scoreArraysPU = scoreArray(resultScorePU)
       const resultPU = await calculateSubtestScores(answerArrayPU, scoreArraysPU, allUserAnswerPU, tryoutId)
@@ -49,7 +49,7 @@ export async function calculateIRT(step: number, prevState: prevState, tryoutId:
       const answerDataKK = await getAnswerKeyArray(tryoutId, "kk")
       const allUserAnswerKK = await getUserAnswerBySubtest(tryoutId, "kk")
       const answerArrayKK = answerDataKK.answerArray as string[];
-      const resultScoreKK = calculateQuestionScore(answerDataKK, allUserAnswerKK, 12, 0.4)
+      const resultScoreKK = calculateQuestionScore(answerDataKK, allUserAnswerKK, 7, 0.4)
       await postQuestionsScore(resultScoreKK)
       const scoreArraysKK = scoreArray(resultScoreKK)
       const resultKK = await calculateSubtestScores(answerArrayKK, scoreArraysKK, allUserAnswerKK, tryoutId)
@@ -60,7 +60,7 @@ export async function calculateIRT(step: number, prevState: prevState, tryoutId:
       const answerDataPBM = await getAnswerKeyArray(tryoutId, "pbm")
       const allUserAnswerPBM = await getUserAnswerBySubtest(tryoutId, "pbm")
       const answerArrayPBM = answerDataPBM.answerArray as string[];
-      const resultScorePBM = calculateQuestionScore(answerDataPBM, allUserAnswerPBM, 12, 0.4)
+      const resultScorePBM = calculateQuestionScore(answerDataPBM, allUserAnswerPBM, 7, 0.4)
       await postQuestionsScore(resultScorePBM)
       const scoreArraysPBM = scoreArray(resultScorePBM)
       const resultPBM = await calculateSubtestScores(answerArrayPBM, scoreArraysPBM, allUserAnswerPBM, tryoutId)
@@ -71,7 +71,7 @@ export async function calculateIRT(step: number, prevState: prevState, tryoutId:
       const answerDataPPU = await getAnswerKeyArray(tryoutId, "ppu")
       const allUserAnswerPPU = await getUserAnswerBySubtest(tryoutId, "ppu")
       const answerArrayPPU = answerDataPPU.answerArray as string[];
-      const resultScorePPU = calculateQuestionScore(answerDataPPU, allUserAnswerPPU, 12, 0.4)
+      const resultScorePPU = calculateQuestionScore(answerDataPPU, allUserAnswerPPU, 7, 0.4)
       await postQuestionsScore(resultScorePPU)
       const scoreArraysPPU = scoreArray(resultScorePPU)
       const resultPPU = await calculateSubtestScores(answerArrayPPU, scoreArraysPPU, allUserAnswerPPU, tryoutId)
@@ -82,7 +82,7 @@ export async function calculateIRT(step: number, prevState: prevState, tryoutId:
       const answerDataLBIND = await getAnswerKeyArray(tryoutId, "lbind")
       const allUserAnswerLBIND = await getUserAnswerBySubtest(tryoutId, "lbind")
       const answerArrayLBIND = answerDataLBIND.answerArray as string[];
-      const resultScoreLBIND = calculateQuestionScore(answerDataLBIND, allUserAnswerLBIND, 12, 0.4)
+      const resultScoreLBIND = calculateQuestionScore(answerDataLBIND, allUserAnswerLBIND, 7, 0.4)
       await postQuestionsScore(resultScoreLBIND)
       const scoreArraysLBIND = scoreArray(resultScoreLBIND)
       const resultLBIND = await calculateSubtestScores(answerArrayLBIND, scoreArraysLBIND, allUserAnswerLBIND, tryoutId)
@@ -93,7 +93,7 @@ export async function calculateIRT(step: number, prevState: prevState, tryoutId:
       const answerDataLBING = await getAnswerKeyArray(tryoutId, "lbing")
       const allUserAnswerLBING = await getUserAnswerBySubtest(tryoutId, "lbing")
       const answerArrayLBING = answerDataLBING.answerArray as string[];
-      const resultScoreLBING = calculateQuestionScore(answerDataLBING, allUserAnswerLBING, 12, 0.4)
+      const resultScoreLBING = calculateQuestionScore(answerDataLBING, allUserAnswerLBING, 7, 0.4)
       await postQuestionsScore(resultScoreLBING)
       const scoreArraysLBING = scoreArray(resultScoreLBING)
       const resultLBING = await calculateSubtestScores(answerArrayLBING, scoreArraysLBING, allUserAnswerLBING, tryoutId)
@@ -104,7 +104,7 @@ export async function calculateIRT(step: number, prevState: prevState, tryoutId:
       const answerDataPM = await getAnswerKeyArray(tryoutId, "pm")
       const allUserAnswerPM = await getUserAnswerBySubtest(tryoutId, "pm")
       const answerArrayPM = answerDataPM.answerArray as string[];
-      const resultScorePM = calculateQuestionScore(answerDataPM, allUserAnswerPM, 12, 0.4)
+      const resultScorePM = calculateQuestionScore(answerDataPM, allUserAnswerPM, 7, 0.4)
       await postQuestionsScore(resultScorePM)
       const scoreArraysPM = scoreArray(resultScorePM)
       const resultPM = await calculateSubtestScores(answerArrayPM, scoreArraysPM, allUserAnswerPM, tryoutId)
