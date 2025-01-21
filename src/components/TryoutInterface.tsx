@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, CircleStop, ZoomIn, ZoomOut } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CircleStop, ZoomIn, ZoomOut, AlertTriangle } from 'lucide-react';
 
 import { Button } from '~/components/ui/button';
 import { Card } from '~/components/ui/card';
@@ -220,6 +220,12 @@ export default function TryoutInterface({
               <LogoSVG className="text-primary w-8 h-8" />
             </span>
             <span className="text-2xl font-bold text-primary">EDUVISION</span>
+          </div>
+
+          {/* Warning Sign Section */}
+          <div className="flex items-center gap-2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded-full">
+            <AlertTriangle className="w-5 h-5" />
+            <span className="text-sm font-medium">Jangan tutup halaman ini sebelum Selesai/Waktu Habis</span>
           </div>
 
           {/* Button Section */}

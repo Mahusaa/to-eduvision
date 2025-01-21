@@ -13,7 +13,7 @@ interface LeaderboardEntryProps {
   sortBy: number
 }
 
-const labels = ["Penalaran Umum", "Kemampuan Kuantitatif", "Pemahaman Bacaan dan Menulis", "Pengetahuan dan Pemahaman Umum", "Literasi Bahasa Indonesia", "Literasi Bahasa Inggris", "Penalaran Matematika"];
+const labels = ["Penalaran Umum", "Pemahaman Bacaan dan Menulis", "Pengetahuan dan Pemahaman Umum", "Kemampuan Kuantitatif", "Literasi Bahasa Indonesia", "Literasi Bahasa Inggris", "Penalaran Matematika"];
 export default function LeaderboardEntry({ entry, rank, sortBy }: LeaderboardEntryProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const averageScore = entry.scores.reduce((sum, score) => sum + score, 0) / entry.scores.length

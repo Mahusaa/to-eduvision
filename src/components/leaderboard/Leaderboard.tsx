@@ -51,7 +51,7 @@ export default function Leaderboard({ data }: LeaderboardProps) {
         <h2 className="text-xl font-semibold mb-3">Top Performers</h2>
         <div className="flex flex-wrap gap-2">
           <SortButton onClick={() => handleSortChange(-1)} isActive={sortBy === -1} label="Semua" />
-          {["PU", "KK", "PBM", "PPU", "LBIND", "LBING", "PM"].map((subtest, index) => (
+          {["PU", "PBM", "PPU", "KK", "LBIND", "LBING", "PM"].map((subtest, index) => (
             <SortButton
               key={subtest}
               onClick={() => handleSortChange(index)}
