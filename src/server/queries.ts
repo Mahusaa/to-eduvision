@@ -1,6 +1,6 @@
 import "server-only"
 import { db } from "./db";
-import { answerKey, questionCalculation, questions, userAnswer, users, userTime, userScore } from "./db/schema";
+import { answerKey, questionCalculation, questions, users, userTime, userScore, meanScore, userAnswer } from "./db/schema";
 import { and, eq, asc } from "drizzle-orm";
 import type { User } from "./db/schema";
 import { tryouts } from "./db/schema";
@@ -26,6 +26,16 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   });
 
   return user ?? null;
+}
+
+export async function getUserAnswerByUserId(userId: string, tryoutId: number) {
+  const userAnswers = await db.select({
+    subtest: userAnswer.subtest,
+    answerKey: userAnswer.answerArray,
+  })
+    .from(userAnswer)
+    .where(and(eq(userAnswer.userId, userId), eq(userAnswer.tryoutId, tryoutId)))
+  return userAnswers;
 }
 
 
@@ -356,7 +366,7 @@ export async function getAnswerKeyArray(tryoutId: number, subtest: string) {
     })
     .from(answerKey)
     .where(and(eq(answerKey.tryoutId, tryoutId), eq(answerKey.subtest, subtest)))
-    .orderBy(answerKey.questionNumber); // Ensure ordered by question number
+    .orderBy(answerKey.questionNumber);
 
   const maxQuestionNumber = answerKeyData.reduce(
     (max, row) => Math.max(max, row.questionNumber),
@@ -444,6 +454,20 @@ export async function postSubtestScore(users: { userId: string | null, tryoutId:
   }
 }
 
+interface UserScore {
+  userName: string | null;
+  userId: string | null;
+  tryoutId: number | null;
+  puScore: string | null;
+  pbmScore: string | null;
+  ppuScore: string | null;
+  kkScore: string | null;
+  lbindScore: string | null;
+  lbingScore: string | null;
+  pmScore: string | null;
+}
+
+
 export async function getAllUserScore(tryoutId: number) {
   const result = await db
     .select({
@@ -461,5 +485,113 @@ export async function getAllUserScore(tryoutId: number) {
     .from(userScore)
     .innerJoin(users, eq(userScore.userId, users.id))
     .where(eq(userScore.tryoutId, tryoutId));
+  return result;
+}
+
+export async function postMeanScore(tryoutId: number) {
+  function calculateMean(scores: UserScore[], scoreField: keyof UserScore): string {
+    const total = scores.reduce((sum, score) => {
+      const scoreValue = score[scoreField];
+      const validScoreValue = scoreValue
+        ? typeof scoreValue === 'number'
+          ? scoreValue
+          : parseFloat(scoreValue)
+        : 0;
+      return sum + validScoreValue;
+    }, 0);
+    const mean = scores.length > 0 ? total / scores.length : 0;
+    return mean.toFixed(2);
+  }
+
+
+  const result: UserScore[] = await getAllUserScore(tryoutId);
+  const meansScores = {
+    puScore: calculateMean(result, 'puScore'),
+    pbmScore: calculateMean(result, 'pbmScore'),
+    ppuScore: calculateMean(result, 'ppuScore'),
+    kkScore: calculateMean(result, 'kkScore'),
+    lbindScore: calculateMean(result, 'lbindScore'),
+    lbingScore: calculateMean(result, 'lbingScore'),
+    pmScore: calculateMean(result, 'pmScore'),
+  };
+
+  const isExisting = await db.select().from(meanScore).where(eq(meanScore.tryoutId, tryoutId)).limit(1);
+
+  if (isExisting.length > 0) {
+    await db.update(meanScore)
+      .set({
+        puScore: meansScores.puScore,
+        pbmScore: meansScores.pbmScore,
+        ppuScore: meansScores.ppuScore,
+        kkScore: meansScores.kkScore,
+        lbindScore: meansScores.lbindScore,
+        lbingScore: meansScores.lbingScore,
+        pmScore: meansScores.pmScore,
+
+      })
+      .where(eq(meanScore.tryoutId, tryoutId))
+  } else {
+    await db.insert(meanScore).values({
+      tryoutId,
+      puScore: meansScores.puScore,
+      pbmScore: meansScores.pbmScore,
+      ppuScore: meansScores.ppuScore,
+      kkScore: meansScores.kkScore,
+      lbindScore: meansScores.lbindScore,
+      lbingScore: meansScores.lbingScore,
+      pmScore: meansScores.pmScore,
+    })
+  }
+}
+
+
+//Summary Tryout
+export async function calculateCorrectIncorrect(userId: string, tryoutId: number) {
+  const userAnswers = await getUserAnswerByUserId(userId, tryoutId);
+  const results: Record<string, { correct: number, incorrect: number }> = {};
+
+  for (const userAnswer of userAnswers) {
+    const { subtest, answerKey: userAnswerArray } = userAnswer;
+
+
+    if (!subtest) {
+      continue;
+    }
+    const { answerArray: correctAnswerArray } = await getAnswerKeyArray(tryoutId, subtest);
+
+    let correct = 0;
+    let incorrect = 0;
+
+    if (typeof userAnswerArray === 'string') {
+      const userAnswerArrayParsed = userAnswerArray.split(',');
+      userAnswerArrayParsed.forEach((userAnswer: string, index: number) => {
+        if (userAnswer === '') {
+          incorrect += 1;
+        } else if (userAnswer === correctAnswerArray[index]) {
+          correct += 1;
+        } else {
+          incorrect += 1;
+        }
+      });
+    } else {
+      console.warn(`userAnswerArray is not a valid string for subtest: ${subtest}`);
+    }
+    results[subtest] = { correct, incorrect };
+  }
+  return results;
+}
+
+
+export async function getMeanScore(tryoutId: number) {
+  const result = await db.query.meanScore.findFirst({
+    where: eq(meanScore.tryoutId, tryoutId),
+  })
+  return result;
+}
+
+export async function getUserScoreByTOandUserId(userId: string, tryoutId: number) {
+  const result = await db.query.userScore.findFirst({
+    where: and(eq(userScore.userId, userId), eq(userScore.tryoutId, tryoutId))
+  })
   return result;
 }

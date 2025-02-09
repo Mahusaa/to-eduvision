@@ -228,6 +228,19 @@ export const userScore = createTable('userScore', {
 })
 );
 
+
+export const meanScore = createTable('meanScore', {
+  id: serial("id").primaryKey(),
+  tryoutId: integer('tryout_id').references(() => tryouts.id),
+  puScore: decimal('pu_score'),
+  pbmScore: decimal('pbm_score'),
+  ppuScore: decimal('ppu_score'),
+  kkScore: decimal('kk_score'),
+  lbindScore: decimal('lbind_score'),
+  lbingScore: decimal('lbing_score'),
+  pmScore: decimal('pm_score'),
+});
+
 export const userScoreBinary = createTable('userScoreBinary', {
   id: serial("id").primaryKey(),
   userId: varchar('user_id', { length: 255 }).references(() => users.id),
