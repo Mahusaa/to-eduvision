@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import {
   RadarChart,
@@ -18,21 +18,17 @@ import type { DataItem } from "~/app/(menu)/analysis/[tryoutId]/page"
 
 // Function to get color based on score
 const getTailwindColor = (score: number) => {
-  if (score >= 900) return "bg-green-600";
-  if (score >= 750) return "bg-green-400";
-  if (score >= 600) return "bg-yellow-400";
-  if (score >= 400) return "bg-orange-400";
-  if (score >= 200) return "bg-red-400";
-  return "bg-red-600";
+  if (score >= 700) return "bg-green-400";
+  if (score >= 500) return "bg-yellow-400";
+  if (score >= 300) return "bg-orange-400";
+  return "bg-red-500";
 };
 
 const getTextTailwindColor = (score: number) => {
-  if (score >= 900) return "text-green-600";
-  if (score >= 750) return "text-green-400";
-  if (score >= 600) return "text-yellow-400";
-  if (score >= 400) return "text-orange-400";
-  if (score >= 200) return "text-red-400";
-  return "text-red-600";
+  if (score >= 700) return "text-green-400";
+  if (score >= 500) return "text-yellow-400";
+  if (score >= 300) return "text-orange-400";
+  return "text-red-500";
 }
 
 const chartConfig = {
@@ -68,8 +64,6 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold mb-6">Test Score Analysis</h1>
-
       <Tabs defaultValue="overall" className="space-y-4">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overall">Analisis Nilai</TabsTrigger>
@@ -200,14 +194,17 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
                   {rankedSubtestData.map((test) => (
                     <button
                       key={test.name}
-                      className={`w-full text-left p-4 rounded-lg transition-colors ${selectedSubtest.name === test.name
+                      className={`w-full text-left p-4 rounded-lg transition-colors ${selectedSubtest?.name === test.name
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary hover:bg-secondary/80"
                         }`}
                       onClick={() => setSelectedSubtest(test)}
                     >
-                      <div className={`text-sm ${getTextTailwindColor(test.userScore)}`} >
-                        Mean Score: {Math.round(test.userScore)}
+                      <div className="flex justify-between items-center">
+                        <div className="font-medium">{test.name}</div>
+                      </div>
+                      <div className={`text-sm opacity-90 ${getTextTailwindColor(test.userScore)}`}>
+                        Nilai: {Math.round(test.userScore)}
                       </div>
                     </button>
                   ))}
@@ -216,7 +213,7 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex justify-between items-center">
-                      {selectedSubtest.name}
+                      {selectedSubtest?.name}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -224,14 +221,18 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
-                            <Brain className="w-5 h-5 text-primary" />
+                            <TrendingUp className="w-5 h-5 text-primary" />
                             <span className="text-sm font-medium">Mean Score</span>
                           </div>
-                          <span className={`text-2xl font-bold ${selectedSubtest?.userScore}`} >
+                          <span className={`text-2xl font-bold ${getTextTailwindColor(selectedSubtest?.userScore ?? 0)}`} >
                             {Math.round(selectedSubtest?.userScore ?? 0)}
                           </span>
                         </div>
-                        <Progress value={(selectedSubtest?.userScore ?? 0 / 1000) * 100} className="h-2" />
+                        <Progress
+                          value={((selectedSubtest?.userScore ?? 0) / 1000) * 100}
+                          className={`h-2 bg-opacity-20 ${getTailwindColor(selectedSubtest?.userScore ?? 0)}`}
+                          indicatorClassName={getTailwindColor(selectedSubtest?.userScore ?? 0)}
+                        />
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
@@ -239,17 +240,14 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
                             <CheckCircle2 className="w-5 h-5 text-green-500" />
                             <span className="text-sm font-medium">Correct Answers</span>
                           </div>
-                          <span className="text-xl font-semibold text-green-500">
-                            {selectedSubtest.correct} ({Math.round(selectedSubtest.correctPercentage)}%)
+                          <span className={`font-semibold ${getTextTailwindColor((selectedSubtest?.correctPercentage ?? 0) * 10)}`}>
+                            {`${selectedSubtest?.correct}/${selectedSubtest?.totalQuestions}`} ({Math.round(selectedSubtest?.correctPercentage ?? 0)}%)
                           </span>
                         </div>
                         <Progress
-                          value={selectedSubtest.correctPercentage}
-                          className="h-2"
-                          style={{
-                            "--progress-background": "hsl(142, 76%, 36%, 0.2)",
-                            "--progress-foreground": "hsl(142, 76%, 36%)",
-                          }}
+                          value={selectedSubtest?.correctPercentage}
+                          className={`h-2 bg-opacity-20 ${getTailwindColor((selectedSubtest?.correctPercentage ?? 0) * 10)}`}
+                          indicatorClassName={getTailwindColor((selectedSubtest?.correctPercentage ?? 0) * 10)}
                         />
                       </div>
                       <div className="space-y-2">
@@ -258,17 +256,14 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
                             <XCircle className="w-5 h-5 text-red-500" />
                             <span className="text-sm font-medium">Incorrect Answers</span>
                           </div>
-                          <span className="text-xl font-semibold text-red-500">
-                            {selectedSubtest.incorrect} ({Math.round(selectedSubtest.incorrectPercentage)}%)
+                          <span className={`font-semibold ${getTextTailwindColor(1000 - ((selectedSubtest?.incorrectPercentage ?? 0) * 10))}`}>
+                            {`${selectedSubtest?.incorrect}/${selectedSubtest?.totalQuestions}`} ({Math.round(selectedSubtest?.incorrectPercentage ?? 0)}%)
                           </span>
                         </div>
                         <Progress
-                          value={selectedSubtest.incorrectPercentage}
-                          className="h-2"
-                          style={{
-                            "--progress-background": "hsl(0, 84%, 60%, 0.2)",
-                            "--progress-foreground": "hsl(0, 84%, 60%)",
-                          }}
+                          value={selectedSubtest?.incorrectPercentage}
+                          className={`h-2 bg-opacity-20 ${getTailwindColor(1000 - ((selectedSubtest?.incorrectPercentage ?? 0) * 10))}`}
+                          indicatorClassName={getTailwindColor(1000 - ((selectedSubtest?.incorrectPercentage ?? 0) * 10))}
                         />
                       </div>
                     </div>
