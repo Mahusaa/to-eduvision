@@ -6,7 +6,6 @@ import { Label } from "~/components/ui/label"
 import { Card } from "~/components/ui/card"
 import { ChevronRight, ZoomOut, ZoomIn, ChevronLeft, Edit, Save, EyeIcon, Loader2 } from 'lucide-react'
 import { Input } from "~/components/ui/input"
-import { Separator } from "../ui/separator"
 import { dataSchema } from "~/types/question-exp"
 import { QuestionNavigator } from "./QuestionNavigator"
 import { OptionEditor } from "./OptionEditor"

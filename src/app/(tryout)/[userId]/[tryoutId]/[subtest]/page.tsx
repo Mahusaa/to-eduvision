@@ -13,10 +13,10 @@ export default async function TryoutInterfacePage(props: { params: Params }) {
   const subtest = params.subtest;
   const userId = params.userId
   const tryoutId = params.tryoutId
-  const allProblem = await getProblembySubtest(tryoutId, subtest);
-  const userTime = await getUserTimebyId(userId, tryoutId);
   const session = await auth()
   if (!session) return redirect("sign-in")
+  const allProblem = await getProblembySubtest(tryoutId, subtest);
+  const userTime = await getUserTimebyId(userId, tryoutId);
   const userName = session.user.name
 
 
