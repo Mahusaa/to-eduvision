@@ -33,7 +33,7 @@ const Header = ({ session }: { session: Session | null }) => {
   }
 
   return (
-    <header className="bg-gradient-to-b from-blue-50 to-white border-b shadow-sm">
+    <header className="bg-white border-b shadow-sm sticky top-0 z-10">
       <div className=" px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex justify-start gap-5">

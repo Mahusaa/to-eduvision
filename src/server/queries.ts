@@ -393,6 +393,13 @@ export async function getUserAnswerBySubtest(tryoutId: number, subtest: string) 
   return rows
 }
 
+export async function getSpesificUserAnswer(userId: string, tryoutId: number, subtest: string) {
+  const answer = await db.query.userAnswer.findFirst({
+    where: and(eq(userAnswer.userId, userId), eq(userAnswer.tryoutId, tryoutId), eq(userAnswer.subtest, subtest))
+  })
+  return answer
+}
+
 
 //IRT calculations
 
@@ -587,6 +594,15 @@ export async function getMeanScore(tryoutId: number) {
     where: eq(meanScore.tryoutId, tryoutId),
   })
   return result;
+}
+
+export async function getAllProblemStatistic(tryoutId: number, subtest: string) {
+  const result = await db.query.questionCalculation.findMany({
+    where: and(eq(questionCalculation.tryoutId, tryoutId), eq(questionCalculation.subtest, subtest)),
+    orderBy: [asc(questionCalculation.questionNumber)]
+  })
+  return result
+
 }
 
 export async function getUserScoreByTOandUserId(userId: string, tryoutId: number) {

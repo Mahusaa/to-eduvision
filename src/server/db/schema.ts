@@ -185,6 +185,8 @@ export const questionCalculation = createTable('questionCalculation', {
   uniqueQC: unique('unique_qc').on(table.questionNumber, table.tryoutId, table.subtest), //uniqueQuestionsCalculation
 }))
 
+export type questionCalculation = typeof questionCalculation.$inferSelect
+
 
 export const userAnswer = createTable('userAnswer', {
   id: serial("id").primaryKey(),
