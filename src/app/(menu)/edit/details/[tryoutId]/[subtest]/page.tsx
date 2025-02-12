@@ -1,5 +1,5 @@
 import AnswerTable from "~/components/admin-interface/AnswerTable";
-import { getAnswerKeyArray, getUserAnswerBySubtest } from "~/server/queries";
+import { calculateCorrectIncorrect, getAnswerKeyArray, getUserAnswerBySubtest } from "~/server/queries";
 import { Button } from "~/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { auth } from "~/server/auth";
@@ -34,6 +34,9 @@ export default async function DetailTryout(props: { params: Params }) {
         ? item.answer.split(",").map(value => (value === "" ? null : value)).filter(v => v !== null)
         : [] // Convert `null` to an empty array
     }))
+
+  const testAnswerCorrect = await calculateCorrectIncorrect(session.user.id, tryoutId)
+  console.log(testAnswerCorrect);
 
   return (
     <div className="w-full mx-auto p-4 ">

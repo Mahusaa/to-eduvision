@@ -185,6 +185,8 @@ export const questionCalculation = createTable('questionCalculation', {
   uniqueQC: unique('unique_qc').on(table.questionNumber, table.tryoutId, table.subtest), //uniqueQuestionsCalculation
 }))
 
+export type questionCalculation = typeof questionCalculation.$inferSelect
+
 
 export const userAnswer = createTable('userAnswer', {
   id: serial("id").primaryKey(),
@@ -227,6 +229,19 @@ export const userScore = createTable('userScore', {
   uniqueConstraint: unique('unique_sc').on(table.userId, table.tryoutId),
 })
 );
+
+
+export const meanScore = createTable('meanScore', {
+  id: serial("id").primaryKey(),
+  tryoutId: integer('tryout_id').references(() => tryouts.id),
+  puScore: decimal('pu_score'),
+  pbmScore: decimal('pbm_score'),
+  ppuScore: decimal('ppu_score'),
+  kkScore: decimal('kk_score'),
+  lbindScore: decimal('lbind_score'),
+  lbingScore: decimal('lbing_score'),
+  pmScore: decimal('pm_score'),
+});
 
 export const userScoreBinary = createTable('userScoreBinary', {
   id: serial("id").primaryKey(),

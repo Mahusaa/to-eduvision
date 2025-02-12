@@ -2,7 +2,7 @@
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { db } from "~/server/db"
-import { answerKey, questionCalculation, questions, tryouts, userAnswer, userScore, userTime } from "~/server/db/schema"
+import { answerKey, meanScore, questionCalculation, questions, tryouts, userAnswer, userScore, userTime } from "~/server/db/schema"
 import type { ActionResponse } from "~/types/delete-tryout"
 
 
@@ -26,6 +26,8 @@ export async function deleteTryout(prevState: ActionResponse | null, id: number)
       .where(eq(userScore.tryoutId, id))
     await db.delete(tryouts)
       .where(eq(tryouts.id, id))
+    await db.delete(meanScore)
+      .where(eq(meanScore.tryoutId, id))
 
 
     revalidatePath("/edit/tryout")

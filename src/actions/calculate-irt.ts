@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import calculateQuestionScore from '~/lib/irt/calculate-questions-score';
 import scoreArray from '~/lib/irt/score-array';
 import { calculateSubtestScores } from '~/lib/irt/user-score-bysubtest';
-import { getAnswerKeyArray, postQuestionsScore, getUserAnswerBySubtest, postSubtestScore } from '~/server/queries';
+import { getAnswerKeyArray, postQuestionsScore, getUserAnswerBySubtest, postSubtestScore, postMeanScore } from '~/server/queries';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -112,7 +112,7 @@ export async function calculateIRT(step: number, prevState: prevState, tryoutId:
       state.stepDetails = `Calculated weights each question and scoring Penalaran Matematika`
       break
     case 9:
-      await delay(1000)
+      await postMeanScore(tryoutId);
       state.stepDetails = `Computed final score`
       break
     default:
