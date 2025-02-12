@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
+import { Button } from "../ui/button"
 import {
   RadarChart,
   PolarGrid,
@@ -15,6 +16,7 @@ import { ChartContainer, ChartTooltipContent, ChartTooltip, ChartLegend, ChartLe
 import { Progress } from "~/components/ui/progress"
 import { CheckCircle2, XCircle, TrendingUp, Trophy } from "lucide-react"
 import type { DataItem } from "~/app/(menu)/analysis/[tryoutId]/page"
+import Link from "next/link"
 
 const getTailwindColor = (score: number) => {
   if (score >= 700) return "bg-green-400";
@@ -40,8 +42,21 @@ const chartConfig = {
     color: "hsl(var(--chart-2))",
   }
 }
+const getAliasFromName = (name: string) => {
+  const aliasMap: Record<string, string> = {
+    "Penalaran Umum": "pu",
+    "Kemampuan Membaca dan Menulis": "pbm",
+    "Pengetahuan dan Pemahaman Umum": "ppu",
+    "Kemampuan Kuantitatif": "kk",
+    "Literasi Bahasa Indonesia": "lbind",
+    "Literasi Bahasa Inggris": "lbing",
+    "Penalaran Matematika": "pm"
+  };
 
-export default function TestScoreVisualization({ dataItem }: { dataItem: DataItem[] }) {
+  return aliasMap[name] ?? null;
+};
+
+export default function TestScoreVisualization({ dataItem, tryoutId }: { dataItem: DataItem[], tryoutId: number }) {
   const rankedSubtestData = useMemo(() => {
     const dataWithMean = dataItem.map((test) => {
       const totalQuestions = test.correct + test.incorrect
@@ -266,9 +281,16 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
                       </div>
                     </div>
                   </CardContent>
+                  <CardFooter className="flex justify-center w-full">
+                    <Link href={`/review/${tryoutId}/${getAliasFromName(selectedSubtest?.name ?? "")}`}>
+                      <Button className="w-full">Lihat Pembahasan</Button>
+                    </Link>
+                  </CardFooter>
+
                 </Card>
               </div>
             </CardContent>
+
           </Card>
         </TabsContent>
       </Tabs>

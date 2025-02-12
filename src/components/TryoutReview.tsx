@@ -10,6 +10,7 @@ import { processMathInHtml } from "~/lib/math-utils";
 import { StarRating } from "./star-rating";
 import type { questionCalculation } from "~/server/db/schema";
 import { QuestionEvaluator } from "~/lib/question-evaluator";
+import Link from "next/link";
 
 
 
@@ -31,18 +32,21 @@ interface ReviewDataProps {
   userAnswerArray: string[];
   answerKeyArray: string[];
   questionCalculation: questionCalculation[]
+  subtest: string;
+  tryoutId: number;
 }
 
 export default function TryoutReview({
   reviewData: reviewData,
   userAnswerArray: userAnswerArray,
   answerKeyArray: answerKeyArray,
-  questionCalculation: questionCalculation
+  questionCalculation: questionCalculation,
+  subtest: subtest,
+  tryoutId: tryoutId,
 }: ReviewDataProps) {
   const [zoomLevel, setZoomLevel] = useState(100);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const subtestProps = "Penalaran Umum"
   const totalQuestions = reviewData.length;
   const currentQuestion = reviewData[currentQuestionIndex];
   const options: string[] = currentQuestion?.option
@@ -55,6 +59,19 @@ export default function TryoutReview({
       setCurrentQuestionIndex(index);
     }
   };
+  const getNameFromAlias = (alias: string) => {
+  const nameMap: Record<string, string> = {
+    "pu": "Penalaran Umum",
+    "pbm": "Kemampuan Membaca dan Menulis",
+    "ppu": "Pengetahuan dan Pemahaman Umum",
+    "kk": "Kemampuan Kuantitatif",
+    "lbind": "Literasi Bahasa Indonesia",
+    "lbing": "Literasi Bahasa Inggris",
+    "pm": "Penalaran Matematika"
+  };
+
+  return nameMap[alias] ?? null;
+};
 
 
   const getDifficultyColor = (difficulty: string) => {
@@ -89,12 +106,20 @@ export default function TryoutReview({
   return (
     <div className="min-h-screen bg-white">
       <main className="max-w-7xl mx-auto p-4 grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-3 space-y-4  h-screen md:sticky  overflow-y-auto">
+        <div className="md:col-span-3 space-y-4">
+          <Link href={`/analysis/${tryoutId}`}>
+            <Button
+              variant="ghost"
+              className="mb-3"
+            >
+              <ChevronLeft className="mr-2 w-4 h-4" />
+              Back</Button>
+          </Link>
           <Card className="p-4 hidden md:block">
             <div className="space-y-4">
               <div className="text-center space-y-2 justify-center">
                 <div className="font-semibold">Pembahasan</div>
-                <div className="text-xs text-gray-400">{subtestProps}</div>
+                <div className="text-xs text-gray-400">{getNameFromAlias(subtest)}</div>
               </div>
             </div>
           </Card>

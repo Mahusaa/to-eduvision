@@ -96,7 +96,7 @@ export default async function Page({
           <ChevronLeft className="mr-2 w-4 h-4" />
           Back</Button>
       </Link>
-      <TestScoreVisualization dataItem={data} />
+      <TestScoreVisualization dataItem={data} tryoutId={tryoutId}/>
     </div>
   )
 }

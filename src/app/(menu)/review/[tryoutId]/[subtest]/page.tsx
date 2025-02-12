@@ -26,6 +26,8 @@ export default async function Page(props: { params: Params }) {
       userAnswerArray={userAnswerArray}
       answerKeyArray={answerArray}
       questionCalculation={problemStats}
+      tryoutId={tryoutId}
+      subtest={subtest}
     />
   )
 }
