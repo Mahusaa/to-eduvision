@@ -13,10 +13,9 @@ import {
 } from "recharts"
 import { ChartContainer, ChartTooltipContent, ChartTooltip, ChartLegend, ChartLegendContent } from "~/components/ui/chart"
 import { Progress } from "~/components/ui/progress"
-import { CheckCircle2, XCircle, TrendingUp, Trophy, Brain } from "lucide-react"
+import { CheckCircle2, XCircle, TrendingUp, Trophy } from "lucide-react"
 import type { DataItem } from "~/app/(menu)/analysis/[tryoutId]/page"
 
-// Function to get color based on score
 const getTailwindColor = (score: number) => {
   if (score >= 700) return "bg-green-400";
   if (score >= 500) return "bg-yellow-400";
@@ -56,7 +55,6 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
 
   const [selectedSubtest, setSelectedSubtest] = useState(rankedSubtestData[0])
 
-  // Calculate overall statistics
   const totalQuestions = rankedSubtestData.reduce((acc, test) => acc + test.totalQuestions, 0)
   const totalCorrect = rankedSubtestData.reduce((acc, test) => acc + test.correct, 0)
   const totalIncorrect = rankedSubtestData.reduce((acc, test) => acc + test.incorrect, 0)
@@ -222,7 +220,7 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <TrendingUp className="w-5 h-5 text-primary" />
-                            <span className="text-sm font-medium">Mean Score</span>
+                            <span className="text-sm font-medium">Nilai</span>
                           </div>
                           <span className={`text-2xl font-bold ${getTextTailwindColor(selectedSubtest?.userScore ?? 0)}`} >
                             {Math.round(selectedSubtest?.userScore ?? 0)}
@@ -238,7 +236,7 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <CheckCircle2 className="w-5 h-5 text-green-500" />
-                            <span className="text-sm font-medium">Correct Answers</span>
+                            <span className="text-sm font-medium">Benar</span>
                           </div>
                           <span className={`font-semibold ${getTextTailwindColor((selectedSubtest?.correctPercentage ?? 0) * 10)}`}>
                             {`${selectedSubtest?.correct}/${selectedSubtest?.totalQuestions}`} ({Math.round(selectedSubtest?.correctPercentage ?? 0)}%)
@@ -254,7 +252,7 @@ export default function TestScoreVisualization({ dataItem }: { dataItem: DataIte
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <XCircle className="w-5 h-5 text-red-500" />
-                            <span className="text-sm font-medium">Incorrect Answers</span>
+                            <span className="text-sm font-medium">Salah</span>
                           </div>
                           <span className={`font-semibold ${getTextTailwindColor(1000 - ((selectedSubtest?.incorrectPercentage ?? 0) * 10))}`}>
                             {`${selectedSubtest?.incorrect}/${selectedSubtest?.totalQuestions}`} ({Math.round(selectedSubtest?.incorrectPercentage ?? 0)}%)

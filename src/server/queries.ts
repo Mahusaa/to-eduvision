@@ -64,7 +64,7 @@ export async function getAllTryoutById(id: string) {
           tryoutEnd: true
         }
       }
-    }
+    },
   })
   return allTryout;
 }
