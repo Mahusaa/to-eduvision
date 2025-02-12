@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
-import { userAnswer } from "~/server/db/schema";
+import { Accordion, AccordionItem, AccordionContent, AccordionTrigger } from "./ui/accordion";
 import { processMathInHtml } from "~/lib/math-utils";
 import { StarRating } from "./star-rating";
 import type { questionCalculation } from "~/server/db/schema";
@@ -70,6 +70,8 @@ export default function TryoutReview({
     }
   }
 
+  const optionMap = ["A", "B", "C", "D", "E"]
+
 
   const checkAnswer = (index: number): boolean => {
     return userAnswerArray[index] === answerKeyArray[index];
@@ -90,7 +92,7 @@ export default function TryoutReview({
         <div className="md:col-span-3 space-y-4  h-screen md:sticky  overflow-y-auto">
           <Card className="p-4 hidden md:block">
             <div className="space-y-4">
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-2 justify-center">
                 <div className="font-semibold">Pembahasan</div>
                 <div className="text-xs text-gray-400">{subtestProps}</div>
               </div>
@@ -128,7 +130,7 @@ export default function TryoutReview({
                   <h2 className="text-lg font-semibold">
                     Soal {currentQuestion!.questionNumber}
                   </h2>
-                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 mb-6">
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                     <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
                       <div className="flex flex-col items-center">
                         <div className="text-sm font-medium text-gray-500">Level</div>
@@ -157,21 +159,20 @@ export default function TryoutReview({
                   />
                 </div>
                 <div>
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     {options.map((option, index) => (
                       <div
                         key={index}
-                        className={`rounded-lg border ${index === currentQuestion?.questionNumber
+                        className={`rounded-lg border ${index === optionMap.indexOf(currentQuestion?.answer ?? "P")
                           ? "border-green-500 bg-green-50"
-                          : index === userAnswer[currentQuestionIndex] && index !== currentQuestion?.answer
+                          : index === optionMap.indexOf(userAnswerArray[currentQuestionIndex] ?? "P") && index !== optionMap.indexOf(currentQuestion?.answer ?? "P")
                             ? "border-red-500 bg-red-50"
                             : "border-gray-200"
                           }`}
                       >
                         <span
-                          className={`${index === currentQuestion.correctAnswer
-                            ? "text-green-700"
-                            : index === currentQuestion.userAnswer && index !== currentQuestion.correctAnswer
+                          className={`${index === optionMap.indexOf(currentQuestion?.answer ?? "P") ? "text-green-700"
+                            : index === optionMap.indexOf(userAnswerArray[currentQuestionIndex] ?? "P") && index !== optionMap.indexOf(currentQuestion?.answer ?? "P")
                               ? "text-red-700"
                               : "text-gray-700"
                             }`}
@@ -182,12 +183,36 @@ export default function TryoutReview({
                           />
                         </span>
                       </div>
+
                     ))}
-                    <div className="mt-6 rounded-lg bg-blue-50 p-4">
-                      <h3 className="mb-2 font-semibold text-blue-800">Penjelasan</h3>
-                      <p className="text-blue-700">{currentQuestion?.explanation}</p>
-                    </div>
+
                   </div>
+                  <div className={`mt-4 p-2 rounded-lg  border  ${currentQuestion?.answer === userAnswerArray[currentQuestionIndex] ? "bg-green-50 border-green-200" : "bg-red-50 border-red-50"}`}>
+                    <h3 className={`font-semibold ${currentQuestion?.answer === userAnswerArray[currentQuestionIndex] ? "text-green-600" : "text-red-500"}`}>
+                      {currentQuestion?.answer !== userAnswerArray[currentQuestionIndex]
+                        ? (userAnswerArray[currentQuestionIndex] === "" ? "Kamu Tidak Menjawab" : "Jawaban Kamu Salah")
+                        : "Jawaban Kamu Benar"}
+                    </h3>
+
+                  </div>
+                  {/* Explanation Accordion */}
+                  <Accordion type="single" collapsible className="mt-4">
+                    <AccordionItem value="explanation">
+                      <AccordionTrigger className="text-blue-500">Penjelasan</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="rounded-lg bg-blue-50 p-4">
+                          <div
+                            className="prose prose-sm max-w-none p-4"
+                            dangerouslySetInnerHTML={{ __html: processMathInHtml(currentQuestion?.explanation ?? "Pembahasan Belom Tersedia") }}
+                          />
+                        </div>
+
+
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+
+
                 </div>
 
                 {/* Navigation */}
