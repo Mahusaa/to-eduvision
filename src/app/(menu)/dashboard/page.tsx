@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import TryoutList from "~/components/TryoutList"
 import { auth } from "~/server/auth";
-import { getAllTryoutById, } from "~/server/queries";
+import { getAllTryoutById } from "~/server/queries";
 import Loading from "../loading";
 import { Suspense } from "react";
 

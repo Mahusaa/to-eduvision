@@ -215,6 +215,15 @@ export default function EditorInterface({ questionsData: initialQuestionsData }:
                 onOptionChange={handleOptionChange}
                 onCorrectAnswerChange={setCorrectAnswer}
               />
+              {!isEditMode && (
+                <div className="rounded-lg bg-blue-50 p-4">
+                  <h3 className="text-blue-500 font-semibold">Penjelasan</h3>
+                  <div
+                    className="prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: processMathInHtml(currentQuestion?.explanation ?? "") }}
+                  />
+                </div>
+              )}
 
               {isEditMode && (
                 <div className="space-y-4">
