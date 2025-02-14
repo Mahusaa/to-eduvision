@@ -14,18 +14,11 @@ export default async function HomePage() {
             UTBK? Easy! Tryout ini bikin lo lebih siap, lebih pede, dan lebih chill ngadepin UTBK beneran!
           </p>
           <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-            <div className="rounded-md shadow">
-              <Button asChild size="lg" className="w-full sm:w-auto">
-                <Link href="/dashboard">
-                  Mulai Tryout <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
-                </Link>
-              </Button>
-            </div>
-            <div className="mt-3 sm:mt-0 sm:ml-3">
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-                <Link href="/sign-in">Login</Link>
-              </Button>
-            </div>
+            <Button asChild size="lg" className="sm:w-auto">
+              <Link href="/dashboard">
+                Mulai Tryout <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
