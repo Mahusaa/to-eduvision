@@ -3,12 +3,12 @@
 import Link from 'next/link'
 import * as React from "react"
 import { useTransition } from 'react'
-import { NavigationMenuLink, NavigationMenuItem, NavigationMenu, NavigationMenuList, NavigationMenuTrigger, NavigationMenuContent, navigationMenuTriggerStyle } from './ui/navigation-menu'
+import { NavigationMenuLink, NavigationMenuItem, NavigationMenu, NavigationMenuList, NavigationMenuTrigger, NavigationMenuContent } from './ui/navigation-menu'
 import { Button } from './ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from './ui/dropdown-menu'
 import LogoSVG from 'public/Logo';
 import { cn } from '~/lib/utils'
-import { LogOut, User, Menu, LayoutDashboard, BarChart3, Settings, ChevronRight } from 'lucide-react'
+import { LogOut, User, Menu, ChevronRight } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 import { logoutAction } from '~/actions/logout-action'
 import { usePathname } from 'next/navigation'
