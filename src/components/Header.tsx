@@ -15,6 +15,8 @@ import { usePathname } from 'next/navigation'
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from './ui/sheet'
 import { NavUser } from './nav-user'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible"
+
+
 type User = {
   name?: string | null;
   email: string;
@@ -27,13 +29,7 @@ type Session = {
   expires: string;
 };
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-}
+
 
 const Header = ({ session }: { session: Session | null }) => {
   const pathname = usePathname()
@@ -108,7 +104,7 @@ const Header = ({ session }: { session: Session | null }) => {
                 <SheetHeader>
                   <SheetTitle>Menu</SheetTitle>
                 </SheetHeader>
-                {/* <MobileNav session={session} />*/}
+                <MobileNav session={session} />
               </SheetContent>
             </Sheet>
           </div>
@@ -228,7 +224,7 @@ function MobileNav({ session }: { session: Session | null }) {
       <div className="px-2 mt-auto">
         {session ? (
           <div className="space-y-1">
-            <NavUser user={data.user} />
+            <NavUser user={session.user} />
           </div>
         ) : (
           <Button asChild variant="default" className="w-full">

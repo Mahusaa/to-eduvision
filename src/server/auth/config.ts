@@ -1,6 +1,6 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import type { DefaultSession, NextAuthConfig, } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import Credentials from "next-auth/providers/credentials";
 
 import { db } from "~/server/db";
 import { users, accounts, sessions, verificationTokens } from "~/server/db/schema";
@@ -31,7 +31,11 @@ declare module "next-auth" {
 
 export const authConfig = {
   providers: [
-    CredentialsProvider({
+    Credentials({
+      credentials: {
+        email: {},
+        password: {},
+      },
       async authorize(credentials) {
         const parsedCredentials = z
           .object({ email: z.string().email(), password: z.string().min(6) })

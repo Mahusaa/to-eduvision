@@ -60,18 +60,18 @@ export default function TryoutReview({
     }
   };
   const getNameFromAlias = (alias: string) => {
-  const nameMap: Record<string, string> = {
-    "pu": "Penalaran Umum",
-    "pbm": "Kemampuan Membaca dan Menulis",
-    "ppu": "Pengetahuan dan Pemahaman Umum",
-    "kk": "Kemampuan Kuantitatif",
-    "lbind": "Literasi Bahasa Indonesia",
-    "lbing": "Literasi Bahasa Inggris",
-    "pm": "Penalaran Matematika"
-  };
+    const nameMap: Record<string, string> = {
+      "pu": "Penalaran Umum",
+      "pbm": "Kemampuan Membaca dan Menulis",
+      "ppu": "Pengetahuan dan Pemahaman Umum",
+      "kk": "Kemampuan Kuantitatif",
+      "lbind": "Literasi Bahasa Indonesia",
+      "lbing": "Literasi Bahasa Inggris",
+      "pm": "Penalaran Matematika"
+    };
 
-  return nameMap[alias] ?? null;
-};
+    return nameMap[alias] ?? null;
+  };
 
 
   const getDifficultyColor = (difficulty: string) => {
@@ -232,7 +232,6 @@ export default function TryoutReview({
                           />
                         </div>
 
-
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
@@ -251,23 +250,6 @@ export default function TryoutReview({
                     <ChevronLeft className="w-4 h-4" />
                     Sebelumnya
                   </Button>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleZoom('out')}
-                    >
-                      <ZoomOut className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleZoom('in')}
-                    >
-                      <ZoomIn className="w-4 h-4" />
-                    </Button>
-                    <span className="text-sm text-gray-500">{zoomLevel}%</span>
-                  </div>
                   <div>
                     <Button
                       className="gap-2 mx-4"
