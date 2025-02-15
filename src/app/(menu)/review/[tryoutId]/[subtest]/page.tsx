@@ -1,5 +1,4 @@
 import { auth } from "~/server/auth";
-import { redirect } from "next/navigation";
 import { getAllProblemStatistic, getAnswerKeyArray, getQuestionAnswerData, getSpesificUserAnswer } from "~/server/queries";
 import TryoutReview from "~/components/TryoutReview";
 
