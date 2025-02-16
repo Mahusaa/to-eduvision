@@ -1,6 +1,9 @@
 import { auth } from "~/server/auth";
 import { getAllProblemStatistic, getAnswerKeyArray, getQuestionAnswerData, getSpesificUserAnswer } from "~/server/queries";
 import TryoutReview from "~/components/TryoutReview";
+import Link from "next/link";
+import { Button } from "~/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 
 
 
@@ -25,13 +28,23 @@ export default async function Page(props: { params: Params }) {
 
 
   return (
-    <TryoutReview
-      reviewData={reviewData}
-      userAnswerArray={userAnswerArray}
-      answerKeyArray={answerArray}
-      questionCalculation={problemStats}
-      tryoutId={tryoutId}
-      subtest={subtest}
-    />
+    <div className="w-full mx-auto p-4">
+      <Link href={"/edit/tryout"}>
+        <Button
+          variant="ghost"
+          className="mb-3"
+        >
+          <ChevronLeft className="mr-2 w-4 h-4" />
+          Back</Button>
+      </Link>
+      <TryoutReview
+        reviewData={reviewData}
+        userAnswerArray={userAnswerArray}
+        answerKeyArray={answerArray}
+        questionCalculation={problemStats}
+        tryoutId={tryoutId}
+        subtest={subtest}
+      />
+    </div>
   )
 }

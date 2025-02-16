@@ -13,7 +13,7 @@ export default async function TryoutEditorPage(props: { params: Params }) {
   const data = await getQuestionAnswerData(tryoutId, subtest)
 
   return (
-    <div className="w-full mx-auto p-4 ">
+    <div className="w-full mx-auto p-4">
       <Link href={"/edit/tryout"}>
         <Button
           variant="ghost"
