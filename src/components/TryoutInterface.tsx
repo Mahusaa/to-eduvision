@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, CircleStop, ZoomIn, ZoomOut, AlertTriangle } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { ChevronLeft, ChevronRight, CircleStop, ZoomIn, ZoomOut, AlertTriangle, ChevronUp } from 'lucide-react';
 
 import { Button } from '~/components/ui/button';
 import { Card } from '~/components/ui/card';
@@ -15,6 +15,9 @@ import LogoSVG from 'public/Logo';
 import { FinishTryoutDialog } from './tryout-interface/FinishTryoutDialog';
 import { processMathInHtml } from '~/lib/math-utils';
 import { useToast } from '~/hooks/use-toast';
+import { breakpoints, useMediaQuery } from '~/hooks/use-media-query';
+import { ScrollArea } from './ui/scroll-area';
+import { Drawer, DrawerContent, DrawerTrigger, DrawerHeader, DrawerTitle, DrawerDescription } from './ui/drawer';
 
 
 const answerSubmissionSchema = z.object({
@@ -52,8 +55,18 @@ export default function TryoutInterface({
   const [isSubmiting, setIsSubmiting] = useState(false)
   const [answers, setAnswers] = useState<(string | null)[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const isDesktop = useMediaQuery(breakpoints.lg)
   const { toast } = useToast();
   const router = useRouter();
+  const problemDescRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Scroll to the problemDesc when the question changes
+    if (problemDescRef.current) {
+      problemDescRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [currentQuestionIndex]);
   const totalQuestions = allProblem.length;
 
   const localStorageKey = `tryout-${tryoutId}-${userId}-${subtestProps}-answers`;
@@ -132,6 +145,28 @@ export default function TryoutInterface({
       }
     }
   }
+  const MobileQuestNav = () => (
+    <ScrollArea className="h-[300px] w-full">
+      <div className="grid grid-cols-5 gap-2 p-4">
+        {allProblem.map((problem, index) => (
+          <Button
+            key={problem.id}
+            variant={index === currentQuestionIndex ? 'default' : 'outline'}
+            className={`
+            h-10 w-full
+             hover:shadow-md
+            ${answers[index] ? "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500" : ""}
+            ${index === currentQuestionIndex ? "ring-1 ring-offset-1 ring-primary" : ""}
+            ${!answers[index] && index !== currentQuestionIndex ? "hover:border-primary/50" : ""}
+          `}
+            onClick={() => handleQuestionChange(index)}
+          >
+            {problem.questionNumber}
+          </Button>
+        ))}
+      </div>
+    </ScrollArea>
+  )
 
   const handleTimeUp = useCallback(async () => {
     try {
@@ -213,20 +248,22 @@ export default function TryoutInterface({
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b p-4 sticky top-0 bg-white z-10">
-        <div className="flex flex-wrap items-center justify-between max-w-7xl mx-auto">
+        <div className="flex flex-wrap items-center justify-between mx-auto">
           {/* Logo and Title Section */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <span>
               <LogoSVG className="text-primary w-8 h-8" />
             </span>
-            <span className="text-2xl font-bold text-primary">EDUVISION</span>
+            <span className="text-2xl font-bold text-primary hidden md:block">EDUVISION</span>
           </div>
 
           {/* Warning Sign Section */}
-          <div className="flex items-center gap-2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded-full">
-            <AlertTriangle className="w-5 h-5" />
-            <span className="text-sm font-medium">Jangan tutup halaman ini sebelum Selesai/Waktu Habis</span>
-          </div>
+          {isDesktop && (
+            <div className="flex items-center gap-2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded-full">
+              <AlertTriangle className="w-5 h-5" />
+              <span className="text-sm font-medium">Jangan tutup halaman ini sebelum Selesai/Waktu Habis</span>
+            </div>
+          )}
 
           {/* Button Section */}
           <div className="mt-2 md:mt-0">
@@ -243,7 +280,7 @@ export default function TryoutInterface({
 
           {/* Timer Section */}
           <div className="flex items-center gap-4 mt-2 md:mt-0">
-            <div className="text-sm text-gray-500">Waktu subtest:</div>
+            <div className="text-sm text-gray-500 hidden md:block">Waktu subtest:</div>
             <TryoutTimer subtestEnd={subtestTime} onTimeUp={handleTimeUp} onSave={handleSave} />
           </div>
         </div>
@@ -252,18 +289,17 @@ export default function TryoutInterface({
 
       <main className="max-w-7xl mx-auto p-4 grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-3 space-y-4">
-          <Card className="p-4 hidden md:block">
+          <Card className="p-4 hidden lg:block">
             <div className="space-y-4">
-              <div className="bg-gray-200 w-32 h-32 rounded-lg mx-auto" />
               <div className="text-center space-y-2">
                 <div className="font-semibold">{userName ? userName : "Peserta"}</div>
                 <div className="text-xs text-gray-400">{subtestProps}</div>
               </div>
             </div>
           </Card>
-          <Card className="p-4">
+          <Card className="p-4 hidden lg:block">
             <h2 className="font-semibold mb-2">Nomor Soal</h2>
-            <div className="sm:flex sm:gap-2 sm:overflow-x-auto sm:whitespace-nowrap lg:grid lg:grid-cols-5 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {allProblem.map((problem, index) => (
                 <Button
                   key={problem.id}
@@ -289,7 +325,7 @@ export default function TryoutInterface({
             <div style={{ zoom: `${zoomLevel}%` }}>
               <div className="space-y-6">
                 <div className="prose max-w-none">
-                  <h2 className="text-lg font-semibold">
+                  <h2 className="text-lg font-semibold" ref={problemDescRef}>
                     Soal {currentQuestion!.questionNumber}
                   </h2>
                   <div
@@ -329,23 +365,25 @@ export default function TryoutInterface({
                     <ChevronLeft className="w-4 h-4" />
                     Sebelumnya
                   </Button>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleZoom('out')}
-                    >
-                      <ZoomOut className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleZoom('in')}
-                    >
-                      <ZoomIn className="w-4 h-4" />
-                    </Button>
-                    <span className="text-sm text-gray-500">{zoomLevel}%</span>
-                  </div>
+                  {isDesktop && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => handleZoom('out')}
+                      >
+                        <ZoomOut className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => handleZoom('in')}
+                      >
+                        <ZoomIn className="w-4 h-4" />
+                      </Button>
+                      <span className="text-sm text-gray-500">{zoomLevel}%</span>
+                    </div>
+                  )}
                   <div>
                     <Button
                       className="gap-2 mx-4"
@@ -362,6 +400,26 @@ export default function TryoutInterface({
           </Card>
         </div>
       </main>
+      {!isDesktop && (
+        <div className="fixed bottom-0 left-0 right-0">
+          <Drawer onOpenChange={setIsDrawerOpen} open={isDrawerOpen} autoFocus={isDrawerOpen}>
+            <DrawerTrigger asChild>
+              <Button variant="outline" className="w-full rounded-none bg-white border-t border-gray-200" aria-label="Quest nav">
+                Nomor Soal <ChevronUp className="ml-2 h-4 w-4" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Navigasi Soal</DrawerTitle>
+                <DrawerDescription>Select a question to jump to it directly</DrawerDescription>
+              </DrawerHeader>
+              <div role="navigation" aria-label="question navigation">
+                <MobileQuestNav />
+              </div>
+            </DrawerContent>
+          </Drawer>
+        </div>
+      )}
     </div>
   );
 }
