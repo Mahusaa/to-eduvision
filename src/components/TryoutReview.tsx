@@ -2,14 +2,17 @@
 import { Card } from "./ui/card";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
 import { Accordion, AccordionItem, AccordionContent, AccordionTrigger } from "./ui/accordion";
 import { processMathInHtml } from "~/lib/math-utils";
+import { ScrollArea } from "./ui/scroll-area";
 import { StarRating } from "./star-rating";
 import type { questionCalculation } from "~/server/db/schema";
 import { QuestionEvaluator } from "~/lib/question-evaluator";
+import { Drawer, DrawerTitle, DrawerTrigger, DrawerContent, DrawerHeader, DrawerDescription } from "./ui/drawer";
+import { useMediaQuery, breakpoints } from "~/hooks/use-media-query";
 import Link from "next/link";
 
 
@@ -44,8 +47,10 @@ export default function TryoutReview({
   subtest: subtest,
   tryoutId: tryoutId,
 }: ReviewDataProps) {
-  const [zoomLevel, setZoomLevel] = useState(100);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const isDesktop = useMediaQuery(breakpoints.lg);
+
 
   const totalQuestions = reviewData.length;
   const currentQuestion = reviewData[currentQuestionIndex];
@@ -60,18 +65,18 @@ export default function TryoutReview({
     }
   };
   const getNameFromAlias = (alias: string) => {
-  const nameMap: Record<string, string> = {
-    "pu": "Penalaran Umum",
-    "pbm": "Kemampuan Membaca dan Menulis",
-    "ppu": "Pengetahuan dan Pemahaman Umum",
-    "kk": "Kemampuan Kuantitatif",
-    "lbind": "Literasi Bahasa Indonesia",
-    "lbing": "Literasi Bahasa Inggris",
-    "pm": "Penalaran Matematika"
-  };
+    const nameMap: Record<string, string> = {
+      "pu": "Penalaran Umum",
+      "pbm": "Kemampuan Membaca dan Menulis",
+      "ppu": "Pengetahuan dan Pemahaman Umum",
+      "kk": "Kemampuan Kuantitatif",
+      "lbind": "Literasi Bahasa Indonesia",
+      "lbing": "Literasi Bahasa Inggris",
+      "pm": "Penalaran Matematika"
+    };
 
-  return nameMap[alias] ?? null;
-};
+    return nameMap[alias] ?? null;
+  };
 
 
   const getDifficultyColor = (difficulty: string) => {
@@ -89,33 +94,37 @@ export default function TryoutReview({
 
   const optionMap = ["A", "B", "C", "D", "E"]
 
+  const MobileQuestNav = () => (
+    <ScrollArea className="h-[300px] w-full">
+      <div className="grid grid-cols-5 gap-2 p-4">
+        {reviewData.map((problem, index) => (
+          <Button
+            key={problem.questionNumber}
+            variant={index === currentQuestionIndex ? 'default' : 'outline'}
+            className={`
+            h-10 w-full
+            ${checkAnswer(index) ? "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500" : "bg-red-500 hover:bg-red-600 text-white border-red-500"}
+            ${index === currentQuestionIndex ? "ring-1 ring-offset-1 ring-primary" : ""}
+          `}
+            onClick={() => handleQuestionChange(index)}
+          >
+            {problem.questionNumber}
+          </Button>
+        ))}
+      </div>
+    </ScrollArea>
+  )
+
+
 
   const checkAnswer = (index: number): boolean => {
     return userAnswerArray[index] === answerKeyArray[index];
   }
-
-
-  const handleZoom = (direction: 'in' | 'out') => {
-    setZoomLevel((prevZoom) => {
-      const newZoom = direction === 'in' ? prevZoom + 10 : prevZoom - 10;
-      return Math.min(Math.max(newZoom, 50), 200);
-    });
-  };
-
-
   return (
     <div className="min-h-screen bg-white">
-      <main className="max-w-7xl mx-auto p-4 grid grid-cols-1 md:grid-cols-12 gap-6">
+      <main className="w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="md:col-span-3 space-y-4">
-          <Link href={`/analysis/${tryoutId}`}>
-            <Button
-              variant="ghost"
-              className="mb-3"
-            >
-              <ChevronLeft className="mr-2 w-4 h-4" />
-              Back</Button>
-          </Link>
-          <Card className="p-4 hidden md:block">
+          <Card className="p-4 hidden lg:block">
             <div className="space-y-4">
               <div className="text-center space-y-2 justify-center">
                 <div className="font-semibold">Pembahasan</div>
@@ -123,15 +132,15 @@ export default function TryoutReview({
               </div>
             </div>
           </Card>
-          <Card className="p-4">
+          <Card className="p-4 hidden lg:block">
             <h2 className="font-semibold mb-2">Nomor Soal</h2>
-            <div className="sm:flex sm:gap-2 sm:overflow-x-auto sm:whitespace-nowrap lg:grid lg:grid-cols-5 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {reviewData.map((problem, index) => (
                 <Button
                   key={problem.questionNumber}
                   variant={index === currentQuestionIndex ? 'default' : 'outline'}
                   className={`
-            h-10 w-10 
+            h-10 w-10
             hover:shadow-md
             hover:text-white
             ${checkAnswer(index) ? "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500" : "bg-red-500 hover:bg-red-600 text-white border-red-500"}
@@ -149,7 +158,7 @@ export default function TryoutReview({
 
         <div className="md:col-span-9">
           <Card className="p-6 overflow-auto">
-            <div style={{ zoom: `${zoomLevel}%` }}>
+            <div >
               <div className="space-y-6">
                 <div className="prose max-w-none">
                   <h2 className="text-lg font-semibold">
@@ -170,7 +179,7 @@ export default function TryoutReview({
                         <div className="mt-1 font-semibold">{parseFloat(questionCalculation[currentQuestionIndex]?.score ?? "0").toFixed(2)}</div>
                       </div>
                       <div className="flex flex-col items-center">
-                        <div className="text-sm font-medium text-gray-500">{evaluator.incorrectPercentage.toFixed(1)}% menjawab salah</div>
+                        <div className="text-sm  text-gray-500">{evaluator.incorrectPercentage.toFixed(1)}% menjawab  salah</div>
                         <div className="mt-3 w-full flex justify-center">
                           <Progress value={evaluator.incorrectPercentage} className="h-3 w-3/4" />
                         </div>
@@ -184,7 +193,7 @@ export default function TryoutReview({
                   />
                 </div>
                 <div>
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     {options.map((option, index) => (
                       <div
                         key={index}
@@ -232,7 +241,6 @@ export default function TryoutReview({
                           />
                         </div>
 
-
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
@@ -251,23 +259,6 @@ export default function TryoutReview({
                     <ChevronLeft className="w-4 h-4" />
                     Sebelumnya
                   </Button>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleZoom('out')}
-                    >
-                      <ZoomOut className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleZoom('in')}
-                    >
-                      <ZoomIn className="w-4 h-4" />
-                    </Button>
-                    <span className="text-sm text-gray-500">{zoomLevel}%</span>
-                  </div>
                   <div>
                     <Button
                       className="gap-2 mx-4"
@@ -284,6 +275,26 @@ export default function TryoutReview({
           </Card>
         </div>
       </main>
+      {!isDesktop && (
+        <div className="fixed bottom-0 left-0 right-0">
+          <Drawer onOpenChange={setIsDrawerOpen} open={isDrawerOpen} autoFocus={isDrawerOpen}>
+            <DrawerTrigger asChild>
+              <Button variant="outline" className="w-full rounded-none bg-white border-t border-gray-200" aria-label="Quest nav">
+                Nomor Soal <ChevronUp className="ml-2 h-4 w-4" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Navigasi Soal</DrawerTitle>
+                <DrawerDescription>Select a question to jump to it directly</DrawerDescription>
+              </DrawerHeader>
+              <div role="navigation" aria-label="question navigation">
+                <MobileQuestNav />
+              </div>
+            </DrawerContent>
+          </Drawer>
+        </div>
+      )}
     </div>
   );
 }

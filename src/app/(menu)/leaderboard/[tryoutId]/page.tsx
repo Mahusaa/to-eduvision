@@ -36,7 +36,7 @@ export default async function Page(props: { params: Params }) {
           </Button>
         </Link>
         <h1 className="text-3xl sm:text-4xl font-bold text-center text-[#1855F3] mb-4 sm:mb-6">
-          Leaderboard Tryout
+          Peringkat Tryout
         </h1>
         <p className="text-center text-gray-600 mb-8 sm:mb-10 max-w-2xl mx-auto">
           View top performers across 7 subtests. Sort by average score or individual subtest scores.
