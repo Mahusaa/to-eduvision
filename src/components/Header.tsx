@@ -8,13 +8,14 @@ import { Button } from './ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from './ui/dropdown-menu'
 import LogoSVG from 'public/Logo';
 import { cn } from '~/lib/utils'
-import { LogOut, User, Menu, ChevronRight } from 'lucide-react'
+import { LogOut, User, Menu, ChevronRight, ArrowUpRight } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar'
 import { logoutAction } from '~/actions/logout-action'
 import { usePathname } from 'next/navigation'
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from './ui/sheet'
 import { NavUser } from './nav-user'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible"
+import { useState } from 'react'
 
 
 type User = {
@@ -34,6 +35,7 @@ type Session = {
 const Header = ({ session }: { session: Session | null }) => {
   const pathname = usePathname()
   const [isPending, startTransition] = useTransition()
+  const [isOpen, setIsOpen] = useState<boolean>(false)
   const handleLogout = () => {
     startTransition(async () => {
       await logoutAction()
@@ -41,7 +43,7 @@ const Header = ({ session }: { session: Session | null }) => {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-blue-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex justify-start gap-5">
@@ -93,7 +95,7 @@ const Header = ({ session }: { session: Session | null }) => {
             )}
           </div>
           <div className="flex items-center">
-            <Sheet>
+            <Sheet onOpenChange={setIsOpen} open={isOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden text-primary hover:text-primary">
                   <Menu className="h-5 w-5" />
@@ -111,8 +113,8 @@ const Header = ({ session }: { session: Session | null }) => {
 
           <div className="hidden md:block">
             {!session ? (
-              <Button asChild variant="ghost">
-                <Link href="/sign-in">Login</Link>
+              <Button asChild variant="ghost" className="group">
+                <Link href="/sign-in">Masuk<ArrowUpRight className="w-4 h-4 mt-0.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></Link>
               </Button>
             ) : (
               <>
@@ -193,30 +195,33 @@ function MobileNav({ session }: { session: Session | null }) {
             <MobileNavLink href="/analytics" active={pathname === "/analytics"}>
               Analytics
             </MobileNavLink>
-            <nav className="w-64 bg-background">
-              <ul className="space-y-2">
-                <li>
-                  <Collapsible>
-                    <div className="flex items-center">
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" className="w-full justify-between group">
-                          <span>Admin</span>
-                          <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+            {session.user.role === "admin" && (
+              <nav className="w-64 bg-background">
+                <ul className="space-y-2">
+                  <li>
+                    <Collapsible>
+                      <div className="flex items-center">
+                        <CollapsibleTrigger asChild>
+                          <Button variant="ghost" className="w-full justify-between group">
+                            <span>Admin</span>
+                            <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                          </Button>
+                        </CollapsibleTrigger>
+                      </div>
+                      <CollapsibleContent className="flex flex-col">
+                        <Button asChild variant="ghost" className="justify-start">
+                          <Link href="/edit/tryout">Tryout</Link>
                         </Button>
-                      </CollapsibleTrigger>
-                    </div>
-                    <CollapsibleContent className="flex flex-col">
-                      <Button asChild variant="ghost" className="justify-start">
-                        <a href="#sub-item-1">Tryout</a>
-                      </Button>
-                      <Button asChild variant="ghost" className="justify-start">
-                        <a href="#sub-item-2">User</a>
-                      </Button>
-                    </CollapsibleContent>
-                  </Collapsible>
-                </li>
-              </ul>
-            </nav>
+                        <Button asChild variant="ghost" className="justify-start">
+                          <Link href="/edit/users">User</Link>
+                        </Button>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </li>
+                </ul>
+              </nav>
+
+            )}
           </div>
         )}
       </div>
@@ -228,7 +233,7 @@ function MobileNav({ session }: { session: Session | null }) {
           </div>
         ) : (
           <Button asChild variant="default" className="w-full">
-            <Link href="/sign-in">Login</Link>
+            <Link href="/sign-in">Masuk</Link>
           </Button>
         )}
       </div>

@@ -23,6 +23,7 @@ import {
 import { Button } from "./ui/button"
 import { useTransition } from "react"
 import { logoutAction } from "~/actions/logout-action"
+import Link from "next/link"
 
 type User = {
   name?: string | null;
@@ -83,10 +84,12 @@ export function NavUser({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <BadgeCheck />
-            Akun
-          </DropdownMenuItem>
+          <Link href="/profile">
+            <DropdownMenuItem>
+              <BadgeCheck />
+              Akun
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem

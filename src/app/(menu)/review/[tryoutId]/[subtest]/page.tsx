@@ -29,7 +29,7 @@ export default async function Page(props: { params: Params }) {
 
   return (
     <div className="w-full mx-auto p-4">
-      <Link href={"/edit/tryout"}>
+      <Link href={`/analysis/${tryoutId}`}>
         <Button
           variant="ghost"
           className="mb-3"

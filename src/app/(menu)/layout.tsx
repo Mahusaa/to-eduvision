@@ -9,7 +9,7 @@ export default async function MenuLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await auth()
   return (
-    <section className="flex flex-col h-screen ">
+    <section className="flex flex-col min-h-screen ">
       {/*@ts-expect-error: my User token.role doesnt define in my User */}
       <Header session={session} />
       {children}

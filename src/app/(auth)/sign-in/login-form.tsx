@@ -98,7 +98,7 @@ export default function LoginForm() {
           <Link
             href="https://bit.ly/TryOutEduvision"
             className="font-medium text-primary hover:underline">
-            Sign up
+            Daftar Sekarang
           </Link>
         </p>
       </CardFooter>

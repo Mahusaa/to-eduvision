@@ -14,7 +14,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body className="flex flex-col h-screen ">
+      <body className="flex flex-col min-h-screen ">
         {children}
       </body>
     </html>
